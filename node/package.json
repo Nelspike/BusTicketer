@@ -1,0 +1,11 @@
+{
+  "name": "BusTicketerServer",
+  "description": "Bus Tickets Server for CMOV Assignement",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "express": "3.x",
+	"supervisor":"0.x",
+	"async":"0.x"
+  }
+}
