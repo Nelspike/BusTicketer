@@ -1,5 +1,5 @@
 var fs = require("fs");
-
+module.exports = Ticket;
 /*
  *	Functions
  */

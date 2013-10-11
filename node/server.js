@@ -71,7 +71,7 @@ app.get('/list/:client', function (req, res) {
 
 	else
 	{
-		var out=ticket.list(client);
+		var out={client:tickets.list(client)};
 		respondToJSON( req, res, out, 200 );
 		
 	}
