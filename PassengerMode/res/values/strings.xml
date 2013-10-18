@@ -10,5 +10,7 @@
     <string name="splash_screen_name_label">Name:</string>
     <string name="splash_screen_card_label">CC No.:</string>
     <string name="splash_screen_register_button">Register it up!</string>
+    <string name="title_activity_central">CentralActivity</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

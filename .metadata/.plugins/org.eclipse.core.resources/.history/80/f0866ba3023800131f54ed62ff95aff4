@@ -1,0 +1,44 @@
+package bus.ticketer.passenger;
+
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+
+public class CentralActivity extends Activity {
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_central);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+//		FragmentManager manager = getFragmentManager();
+//		switch (item.getItemId()) {
+//		case R.id.actionadd1:
+//			FragmentTransaction transaction = manager.beginTransaction();
+//			transaction.add(R.id.ShowFragContainer, new MyListFragment());
+//			transaction
+//					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//			transaction.commit();
+//			break;
+//		case R.id.actionadd2:
+//			transaction = manager.beginTransaction();
+//			transaction.add(R.id.BuyFragContainer, new DetailFragment());
+//			transaction.commit();
+//			break;
+//
+//		default:
+//			break;
+//		}
+
+		// transaction = getFragmentManager().beginTransaction();
+		// transaction.add(R.id.fragmentcontainer2, new DetailFragment());
+		// transaction.commit();
+		return true;
+	}
+
+}
