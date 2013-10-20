@@ -1,0 +1,77 @@
+package bus.ticketer.connection;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import org.apache.http.client.methods.HttpPost;
+import org.json.JSONObject;
+
+import android.util.SparseArray;
+
+public class ConnectionHandler implements Runnable {
+
+	private String link, result, method;
+	private SparseArray<String> arguments;
+	private JSONObject payload;
+	private int readTimeout = 10000, connectionTimeout = 15000;
+	
+	public ConnectionHandler(String link, SparseArray<String> args, String method, JSONObject payload) {
+		this.link = link;
+		this.arguments = args;
+		this.method = method;
+		this.payload = payload;
+		constructLink();
+	}
+	
+	@Override
+	public void run() {
+	
+	}
+	
+	public void connect() {
+		HttpURLConnection con = null;
+		String line = "";
+		StringBuffer sb = new StringBuffer();
+        try {
+            
+            URL url = new URL(link);
+            con = (HttpURLConnection) url.openConnection();
+            con.setReadTimeout(readTimeout);      /* milliseconds */
+            con.setConnectTimeout(connectionTimeout);   /* milliseconds */
+            con.setRequestMethod(method);
+            con.setDoInput(true);
+
+            // Start the connection
+            con.connect();
+
+            // Read results from the query
+            BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8" ));
+            
+            while ((line = reader.readLine()) != null)
+				sb.append(line);
+            
+            result = sb.toString();
+            
+            reader.close();
+            } 
+        catch (IOException e) {
+        	//Handle Error
+          } 
+        finally {
+            if (con != null)
+              con.disconnect();
+         }
+	}
+	
+	private void constructLink() {
+		for(int i = 0; i < arguments.size(); i++) {
+			Integer key = arguments.keyAt(i);
+			String value = arguments.get(key);
+			link += "/"+value;
+		}
+	}
+
+}

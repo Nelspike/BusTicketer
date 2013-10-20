@@ -1,0 +1,198 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BuyTicketsFragment" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:stretchColumns="1" >
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" >
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp" >
+
+                    <ImageView
+                        android:id="@+id/t1_ticket_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/description"
+                        android:src="@drawable/t1" />
+
+                    <TextView
+                        android:id="@+id/t1_ticket_quantity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/t1_ticket_image"
+                        android:layout_alignRight="@+id/t1_ticket_image"
+                        android:layout_margin="1dp"
+                        android:gravity="center"
+                        android:text="@string/zero_tickets"
+                        android:textColor="@color/White"
+                        android:textStyle="bold|italic" />
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_gravity="center" >
+
+                    <Button
+                        android:id="@+id/t1_ticket_minus"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/minus_sign"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/t1_ticket_quantity_buy"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/zero_tickets"
+                        android:textSize="20sp" />
+
+                    <Button
+                        android:id="@+id/t1_ticket_plus"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/plus_sign"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp" >
+
+                    <ImageView
+                        android:id="@+id/t2_ticket_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/description"
+                        android:src="@drawable/t2" />
+
+                    <TextView
+                        android:id="@+id/t2_ticket_quantity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/t2_ticket_image"
+                        android:layout_alignRight="@+id/t2_ticket_image"
+                        android:layout_margin="1dp"
+                        android:gravity="center"
+                        android:text="@string/zero_tickets"
+                        android:textColor="@color/White"
+                        android:textStyle="bold|italic" />
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_gravity="center" >
+
+                    <Button
+                        android:id="@+id/t2_ticket_minus"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/minus_sign"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/t2_ticket_quantity_buy"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/zero_tickets"
+                        android:textSize="20sp" />
+
+                    <Button
+                        android:id="@+id/t2_ticket_plus"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/plus_sign"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp" >
+
+                    <ImageView
+                        android:id="@+id/t3_ticket_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/description"
+                        android:src="@drawable/t3" />
+
+                    <TextView
+                        android:id="@+id/t3_ticket_quantity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/t3_ticket_image"
+                        android:layout_alignRight="@+id/t3_ticket_image"
+                        android:layout_margin="1dp"
+                        android:gravity="center"
+                        android:text="@string/zero_tickets"
+                        android:textColor="@color/White"
+                        android:textStyle="bold|italic" />
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_gravity="center" >
+
+                    <Button
+                        android:id="@+id/t3_ticket_minus"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/minus_sign"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/t3_ticket_quantity_buy"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/zero_tickets"
+                        android:textSize="20sp" />
+
+                    <Button
+                        android:id="@+id/t3_ticket_plus"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/plus_sign"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </TableRow>
+        </TableLayout>
+
+        <Button
+            android:id="@+id/buy_tickets_button"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:text="@string/buy_tickets"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+</FrameLayout>

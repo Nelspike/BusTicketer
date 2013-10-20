@@ -1,3 +1,5 @@
 com.android.ide.eclipse.adt.fixLegacyEditors=1
-com.android.ide.eclipse.adt.sdk=C\:\\Android DevKit\\sdk
+com.android.ide.eclipse.adt.palette=SMALL_PREVIEW
+com.android.ide.eclipse.adt.sdk=C\:\\Program Files (x86)\\Android\\android-sdk
+com.android.ide.eclipse.adt.xmlEditor=true
 eclipse.preferences.version=1

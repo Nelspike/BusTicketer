@@ -1,0 +1,47 @@
+package bus.ticketer.connection;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import android.util.SparseArray;
+
+public class ConnectionHandler implements Runnable {
+
+	private String link;
+	private SparseArray<String> arguments;
+	
+	public ConnectionHandler(String link, SparseArray<String> args) {
+		this.link = link;
+		arguments = args;
+	}
+	
+	@Override
+	public void run() {
+		HttpURLConnection con = null;
+		
+        try {
+            
+            URL url = new URL(link);
+
+            con = (HttpURLConnection) url.openConnection();
+            con.setReadTimeout(10000);      /* milliseconds */
+            con.setConnectTimeout(15000);   /* milliseconds */
+            con.setRequestMethod("GET");
+            con.setDoInput(true);
+
+            // Start the query
+            con.connect();
+
+            // Read results from the query
+            BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8" ));
+            payload = reader.readLine();
+            reader.close();
+            } catch (IOException e) {
+          } finally {
+            if (con != null)
+              con.disconnect();
+          }
+		
+	}
+
+}
