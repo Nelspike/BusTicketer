@@ -3104,3 +3104,9 @@ user global configuration and to define the default location to store repositori
 not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
 EGit might behave differently since they see different configuration options.
 This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY de.fu_berlin.inf.dpp 2 0 2013-10-20 20:07:16.465
+!MESSAGE unexpected method call (NullSarosSession.java:66)
+
+!ENTRY de.fu_berlin.inf.dpp 2 0 2013-10-20 20:07:16.467
+!MESSAGE unexpected method call (NullSarosSession.java:66)
