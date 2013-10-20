@@ -1,0 +1,11 @@
+package bus.ticketer.connection;
+
+import android.os.Handler;
+import android.os.Message;
+
+public class ConnectionHandler extends Handler {
+	@Override
+	public void handleMessage(Message msg) {
+		
+	}
+}

@@ -1,0 +1,50 @@
+package bus.ticketer.connection;
+
+import java.util.ArrayList;
+
+import org.apache.http.NameValuePair;
+import org.json.JSONObject;
+
+import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import bus.ticketer.utils.Method;
+
+public class ConnectionThread extends Thread{
+	
+	private ConnectionHandler runConnection;
+	private Handler mHandler;
+	
+	public ConnectionThread(String link, Method method, ArrayList<NameValuePair> payload) {
+		runConnection = new ConnectionHandler(link, method.toString(), payload);
+	}
+	
+	@SuppressLint("HandlerLeak")
+	@Override
+	public void run() {
+		
+		Looper.prepare();
+		
+        mHandler = new Handler() {
+            public void handleMessage(Message msg) {
+            	runConnection.run();
+            }
+        };
+		
+		Looper.loop();
+		
+		Message msg = Message.obtain();
+		msg.obj =  getJSON();
+		mHandler.sendMessage(msg);
+		
+		System.out.println("Here?");
+		System.out.println(getJSON().toString());
+		
+		
+	}
+	
+	public JSONObject getJSON() {
+		return runConnection.getResultObject();
+	}
+}
