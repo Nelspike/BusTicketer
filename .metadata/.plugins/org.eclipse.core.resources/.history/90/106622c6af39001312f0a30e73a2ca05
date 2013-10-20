@@ -1,0 +1,74 @@
+package bus.ticketer.connection;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import android.util.SparseArray;
+
+public class ConnectionHandler implements Runnable {
+
+	private String link;
+	private SparseArray<String> arguments;
+	private String result;
+	private String method;
+	
+	public ConnectionHandler(String link, SparseArray<String> args, String method) {
+		this.link = link;
+		this.arguments = args;
+		this.method = method;
+		constructLink();
+	}
+	
+	@Override
+	public void run() {
+	
+	}
+	
+	public void connect() {
+		HttpURLConnection con = null;
+		String line = "";
+		StringBuffer sb = new StringBuffer();
+        try {
+            
+            URL url = new URL(link);
+
+            con = (HttpURLConnection) url.openConnection();
+            con.setReadTimeout(10000);      /* milliseconds */
+            con.setConnectTimeout(15000);   /* milliseconds */
+            con.setRequestMethod("GET");
+            con.setDoInput(true);
+
+            // Start the query
+            con.connect();
+
+            // Read results from the query
+            BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8" ));
+            
+            while ((line = reader.readLine()) != null)
+				sb.append(line);
+            
+            result = sb.toString();
+            
+            reader.close();
+            } 
+        catch (IOException e) {
+        	//Handle Error
+          } 
+        finally {
+            if (con != null)
+              con.disconnect();
+         }
+	}
+	
+	private void constructLink() {
+		for(int i = 0; i < arguments.size(); i++) {
+			Integer key = arguments.keyAt(i);
+			String value = arguments.get(key);
+			link += "/"+value;
+		}
+	}
+
+}

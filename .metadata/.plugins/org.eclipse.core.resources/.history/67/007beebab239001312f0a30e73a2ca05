@@ -1,0 +1,30 @@
+package bus.ticketer.utils;
+
+import java.util.ArrayList;
+
+public class Pair<K, V> {
+	private ArrayList<K> keys;
+	private ArrayList<V> values;
+	
+	public Pair () {
+		this.keys = new ArrayList<K>();
+		this.values = new ArrayList<V>();
+	}
+	
+	public boolean add(K key, V value) {
+		if(keys.add(key) && values.add(value))
+			return true;
+		
+		return false;		
+	}
+	
+	public V getValue(K key) {
+		int position = keys.indexOf(key);
+		
+		if(position == -1)
+			return null;
+		
+		return values.get(position);
+	}
+	
+}

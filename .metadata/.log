@@ -3078,3 +3078,29 @@ java.lang.NullPointerException
 	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:584)
 	at org.eclipse.equinox.launcher.Main.run(Main.java:1438)
 	at org.eclipse.equinox.launcher.Main.main(Main.java:1414)
+
+!ENTRY de.fu_berlin.inf.dpp 2 0 2013-10-20 02:45:03.568
+!MESSAGE unexpected method call (NullSarosSession.java:66)
+
+!ENTRY de.fu_berlin.inf.dpp 2 0 2013-10-20 02:45:03.569
+!MESSAGE unexpected method call (NullSarosSession.java:66)
+!SESSION 2013-10-20 17:40:15.667 -----------------------------------------------
+eclipse.buildId=M20130204-1200
+java.version=1.7.0_07
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_GB
+Framework arguments:  -product org.eclipse.epp.package.jee.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.jee.product
+
+!ENTRY de.fu_berlin.inf.dpp 2 0 2013-10-20 17:40:21.060
+!MESSAGE unexpected method call (NullSarosSession.java:66)
+
+!ENTRY de.fu_berlin.inf.dpp 2 0 2013-10-20 17:40:21.101
+!MESSAGE unexpected method call (NullSarosSession.java:66)
+
+!ENTRY org.eclipse.egit.ui 2 0 2013-10-20 17:40:32.631
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Nelspike'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.

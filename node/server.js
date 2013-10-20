@@ -23,8 +23,7 @@ app.configure(function() {
 var args = process.argv.splice(2),
 	p = null;
 
-if (args.length > 0)
-{
+if (args.length > 0) {
 	p = parseInt(args[0]);
 	if( p )
 		port = p ;
@@ -40,7 +39,6 @@ app.listen(port);
 // Funcoes
 
 function respondToJSON(req, res, out, statusCode) {
-
 	var size;
 
 	out = JSON.stringify( out );
@@ -67,26 +65,23 @@ function respondToJSON(req, res, out, statusCode) {
 //RETURN JSON {name:<clientname>,id:<clientid>}
 app.post('/client/create',function (req,res) {
 	var client=new dbLib.Client(req.body.name);
-	if( !req.body.name ||!req.body.nib||!req.body.pass)
+	if( !req.body.name || !req.body.nib || !req.body.pass)
 		respondToJSON( req, res, {error: 'Bad request'}, 400 );
 	else
 	{
-		client.nib=req.body.nib;
-		db.createClient(client,req.body.pass, function(err, lastID, row)
-		{
+		client.nib = req.body.nib;
+		db.createClient(client,req.body.pass, function(err, lastID, row) {
 			var out = {},
 				code;
 
-			if( err )
-			{
+			if( err ) {
 				code = 500;
 				out.id = -1;
 				out.error = 'Impossible to add client';
 
 				console.log('Error adding client: ' + err);
 			}
-			else
-			{
+			else {
 				code = 200;
 				out.id = lastID;
 				out.name=client.name;
@@ -109,21 +104,18 @@ app.post('/client/login',function (req,res) {
 	else
 	{
 		var name=req.body.name,pass=req.body.pass;
-		db.login(name,pass, function(err,row)
-		{
+		db.login(name,pass, function(err,row) {
 			var out = {},
 				code;
 
-			if( err )
-			{
+			if( err ) {
 				code = 500;
 				out.id = -1;
 				out.error = 'Impossible to add client';
 
 				console.log('Error login client: ' + err);
 			}
-			else
-			{
+			else {
 				code = 200;
 				if (!row)
 				{
@@ -153,13 +145,12 @@ app.get('/list/:client', function (req, res) {
 
 	var client = req.params.client;
 
-	// Verifica se todos os valores enviados s„o inteiros e maiores que zero
-	// N„o verifica se os cÛdigos enviados existem na base de dados
+	// Verifica se todos os valores enviados s√£o inteiros e maiores que zero
+	// N√£o verifica se os c√≥digos enviados existem na base de dados
 	if( !client )
 		respondToJSON( req, res, {error: 'Bad request'}, 400 );
 
-	else
-	{
+	else {
 		
 		var out;
 		respondToJSON( req, res, out, 200 );
@@ -167,14 +158,11 @@ app.get('/list/:client', function (req, res) {
 	}
 });
 
-
- 
- 
  app.all('*', function (req, res) {
 
 	console.log('Pedido n„o encontrado: ' + req.path + " [" + req.method + "]");
 
-	respondToJSON( req, res, { error: 'P·gina n„o encontrada'}, 404 );
+	respondToJSON( req, res, { error: 'P√°gina n√£o encontrada'}, 404 );
 });
 
 
