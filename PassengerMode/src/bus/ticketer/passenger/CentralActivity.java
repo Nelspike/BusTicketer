@@ -6,31 +6,48 @@ import android.os.Bundle;
 import android.support.v4.app.*;
 import android.support.v4.view.*;
 import android.view.*;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.TextView;
 
 public class CentralActivity extends FragmentActivity {
 	CentralPagerAdapter mCentralActivity;
 	ViewPager mViewPager;
-	private int nSwipes = 2;
+	static View rootView;
+	private int nSwipes = 3;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);		
 		setContentView(R.layout.activity_central);
 		
-        // ViewPager and its adapters use support library
-        // fragments, so use getSupportFragmentManager.
+		tabHandler();
+	}
+	
+	public void tabHandler() {
         mCentralActivity =
                 new CentralPagerAdapter(
                         getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.CentralPager);
         mViewPager.setAdapter(mCentralActivity);
         
+       mViewPager.setOnPageChangeListener(
+                new ViewPager.SimpleOnPageChangeListener() {
+                    @Override
+                    public void onPageSelected(int position) {
+                        getActionBar().setSelectedNavigationItem(position);
+                    }
+                });
+        
         final ActionBar actionBar = getActionBar();
+        
+        actionBar.setDisplayShowTitleEnabled(false); 
+        actionBar.setDisplayShowHomeEnabled(false);
 
-        // Specify that tabs should be displayed in the action bar.
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        // Create a tab listener that is called when the user changes tabs.
         ActionBar.TabListener tabListener = new ActionBar.TabListener() {
 
 
@@ -44,8 +61,7 @@ public class CentralActivity extends FragmentActivity {
 			@Override
 			public void onTabSelected(Tab arg0,
 					android.app.FragmentTransaction arg1) {
-				// show the tab
-				
+				mViewPager.setCurrentItem(arg0.getPosition());
 			}
 
 			@Override
@@ -56,16 +72,15 @@ public class CentralActivity extends FragmentActivity {
 			}
         };
 
-        // Add 3 tabs, specifying the tab's text and TabListener
-        for (int i = 0; i < nSwipes; i++) {
-            actionBar.addTab(
-                    actionBar.newTab()
-                            .setText("Tab " + (i + 1))
-                            .setTabListener(tabListener));
-        }
+        actionBar.addTab(actionBar.newTab().setText("Validate").setTabListener(tabListener));
+        actionBar.addTab(actionBar.newTab().setText("Buy Tickets").setTabListener(tabListener));
+        actionBar.addTab(actionBar.newTab().setText("History").setTabListener(tabListener));
+        
+
 	}
 
 	public class CentralPagerAdapter extends FragmentStatePagerAdapter {
+		
 	    public CentralPagerAdapter(FragmentManager fm) {
 	        super(fm);
 	    }
@@ -74,7 +89,6 @@ public class CentralActivity extends FragmentActivity {
 	    public Fragment getItem(int i) {
 	        Fragment fragment = new CentralFragment();
 	        Bundle args = new Bundle();
-	        // Our object is just an integer :-P
 	        args.putInt(CentralFragment.ARG_OBJECT, i + 1);
 	        fragment.setArguments(args);
 	        return fragment;
@@ -89,10 +103,10 @@ public class CentralActivity extends FragmentActivity {
 	    public CharSequence getPageTitle(int position) {
 	        return "OBJECT " + (position + 1);
 	    }
+	    
+	    
 	}
-	
-	// Instances of this class are fragments representing a single
-	// object in our collection.
+
 	public static class CentralFragment extends Fragment {
 	    public static final String ARG_OBJECT = "object";
 
@@ -101,17 +115,139 @@ public class CentralActivity extends FragmentActivity {
 	            ViewGroup container, Bundle savedInstanceState) {
 
 	    	Bundle args = getArguments();
-	    	View rootView;
 	    	if(args.getInt(ARG_OBJECT) == 1) {
 	    		rootView = inflater.inflate(
-		                R.layout.fragment_show_tickets, container, false);	
+		                R.layout.fragment_show_tickets, container, false);
+	    		
+	    		showTicketsHandler();
+	    	}
+	    	else if(args.getInt(ARG_OBJECT) == 2) {
+	    		rootView = inflater.inflate(
+		                R.layout.fragment_buy_tickets, container, false);
+	    		
+	    		buyTicketsHandler();
 	    	}
 	    	else {
 	    		rootView = inflater.inflate(
-		                R.layout.fragment_buy_tickets, container, false);
+		                R.layout.fragment_history_tickets, container, false);	    		
 	    	}
-	    	
+
 	        return rootView;
+	    }
+	    
+	    public void showTicketsHandler() {
+			RadioGroup radioGroup = (RadioGroup) rootView.findViewById(R.id.ticket_radio);
+			radioGroup.check(R.id.t1_radio);
+			final TextView ticketsText = (TextView) rootView.findViewById(R.id.show_ticket_amount);
+			ticketsText.setText("T1 Tickets");
+		    radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+		        public void onCheckedChanged(RadioGroup group, int checkedId) {
+		          	switch(checkedId) {
+		          		case R.id.t1_radio:
+		          			ticketsText.setText("T1 Tickets");
+		          			break;
+		          		case R.id.t2_radio:
+		          			ticketsText.setText("T2 Tickets");
+		          			break;
+		          		case R.id.t3_radio:
+		          			ticketsText.setText("T3 Tickets");
+		          			break;
+	          			default:
+	          				break;
+		          	}
+		          			
+		        }
+		    });	    	
+	    }
+	    
+	    public void buyTicketsHandler() {
+	    	Button t1Minus = (Button) rootView.findViewById(R.id.t1_ticket_minus);
+	    	Button t2Minus = (Button) rootView.findViewById(R.id.t2_ticket_minus);
+	    	Button t3Minus = (Button) rootView.findViewById(R.id.t3_ticket_minus);
+	    	Button t1Plus = (Button) rootView.findViewById(R.id.t1_ticket_plus);
+	    	Button t2Plus = (Button) rootView.findViewById(R.id.t2_ticket_plus);
+	    	Button t3Plus = (Button) rootView.findViewById(R.id.t3_ticket_plus);
+	    	final TextView t1Tickets = (TextView) rootView.findViewById(R.id.t1_ticket_quantity_buy);
+	    	final TextView t2Tickets = (TextView) rootView.findViewById(R.id.t2_ticket_quantity_buy);
+	    	final TextView t3Tickets = (TextView) rootView.findViewById(R.id.t3_ticket_quantity_buy);
+	    	
+	    	t1Minus.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					int current = Integer.parseInt(t1Tickets.getText().toString());
+					
+					if(current == 0)
+						return;
+					
+					current--;
+					t1Tickets.setText(current+"");
+				}
+	    		
+	    	});
+	    	
+	    	t2Minus.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					int current = Integer.parseInt(t2Tickets.getText().toString());
+					
+					if(current == 0)
+						return;
+					
+					current--;
+					t2Tickets.setText(current+"");
+				}
+	    		
+	    	});
+	    	
+	    	t3Minus.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					int current = Integer.parseInt(t3Tickets.getText().toString());
+					
+					if(current == 0)
+						return;
+					
+					current--;
+					t3Tickets.setText(current+"");
+				}
+	    		
+	    	});
+	    	
+	    	t1Plus.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					int current = Integer.parseInt(t1Tickets.getText().toString());
+					current++;
+					t1Tickets.setText(current+"");
+				}
+	    		
+	    	});
+	    	
+	    	t2Plus.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					int current = Integer.parseInt(t2Tickets.getText().toString());
+					current++;
+					t2Tickets.setText(current+"");
+				}
+	    		
+	    	});
+	    	
+	    	t3Plus.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					int current = Integer.parseInt(t3Tickets.getText().toString());
+					current++;
+					t3Tickets.setText(current+"");
+				}
+	    		
+	    	});
 	    }
 	}
 

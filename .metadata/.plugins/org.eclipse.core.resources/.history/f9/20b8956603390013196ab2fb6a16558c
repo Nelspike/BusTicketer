@@ -1,0 +1,86 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ShowTicketsFragment" >
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="10dp">
+ 
+	    <TextView 
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/show_tickets_title"
+	        android:textSize="25sp"
+	        android:gravity="center"/>
+	    
+		<RadioGroup
+		    android:id="@+id/ticket_radio"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:gravity="center"
+		    android:orientation="horizontal"
+		    android:paddingTop="20dp"
+		    android:paddingBottom="30dp" >
+
+			<RadioButton
+			    android:id="@+id/t1_radio"
+			    android:button="@null"
+			    android:drawable="@drawable/t1_selector"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"/>
+
+			<RadioButton
+			    android:id="@+id/t2_radio"
+			    android:button="@null"
+			    android:background="@drawable/t2_selector"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"/>
+
+			<RadioButton
+			    android:id="@+id/t3_radio"
+			    android:button="@null"
+			    android:background="@drawable/t3_selector"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"/>
+
+		</RadioGroup>
+		
+		<Button
+		    android:id="@+id/t1_ticket_validate"
+		    android:layout_width="250dp"
+		    android:layout_height="wrap_content"
+		    android:layout_gravity="center"
+		    android:text="@string/validate_ticket"
+		    android:textSize="15sp" />
+		
+		<ImageView 
+		    android:id="@+id/qr_code_holder"
+		    android:contentDescription="@string/description"
+		    android:layout_width="450px"
+		    android:layout_height="450px"
+		    android:src="@drawable/bus"
+		    android:layout_gravity="center"
+		    android:paddingTop="40dp"/>
+		
+		<TextView 
+		    android:id="@+id/ticket_timer"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:gravity="center"
+		    android:text="Timer Holder"
+		    android:textSize="20sp"
+		    android:paddingTop="30dp"/>
+        
+    </LinearLayout>
+    
+
+
+
+</FrameLayout>
