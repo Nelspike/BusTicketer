@@ -1,5 +1,0 @@
-package bus.ticketer.utils;
-
-public enum Method {
-
-}
