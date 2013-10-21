@@ -8,6 +8,8 @@
     <string name="splash_screen_description">Splash Screen Logo</string>
     <string name="splash_screen_terms">Lorem ipsum dolor sit amet, consectetur adipiscing elit. In porta cursus lacus ut porta. Ut luctus et urna eu malesuada. Donec magna diam, mollis molestie est eu, bibendum semper quam. Curabitur rhoncus iaculis nisi ut luctus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Ut luctus gravida massa, a posuere nunc sagittis ac. Maecenas porta nisi sed interdum varius. Nunc tincidunt turpis nec orci interdum sollicitudin in at nulla. Integer non lorem a elit elementum iaculis consectetur vel ipsum. Aenean sed eros laoreet, egestas lacus eu, accumsan risus. Aliquam consequat sagittis urna, quis accumsan felis malesuada sed.</string>
     <string name="splash_screen_name_label">Name:</string>
+    <string name="splash_screen_password_label">Password:</string>
+    <string name="splash_screen_validity_label">Validity:</string>
     <string name="splash_screen_card_label">CC No.:</string>
     <string name="splash_screen_register_button">Register it up!</string>
     <string name="title_activity_central">CentralActivity</string>
@@ -19,5 +21,13 @@
     <string name="plus_sign">+</string>
     <string name="minus_sign">-</string>
     <string name="zero_tickets">0</string>
+    <string-array name="cc_type_spinner_vals">
+        <item>Visa</item>
+        <item>Visa Electron</item>
+        <item>Maestro</item>
+        <item>Master Card</item>
+        <item>American Express</item>
+        <item>Multibanco</item>
+    </string-array>
 
 </resources>
