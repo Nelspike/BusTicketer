@@ -61,12 +61,12 @@ function respondToJSON(req, res, out, statusCode) {
  
  
 //Criar um cliente
-//POST PARAMS: name string,nib string,pass string
+//POST PARAMS: name string,nib string,pass string,cardType string, validity string
 //RETURN JSON {name:<clientname>,id:<clientid>}
 app.post('/client/create',function (req,res) {
 	//console.log(req);
 	var client = new dbLib.Client(req.body.name);
-	if( !req.body.name || !req.body.nib || !req.body.pass) {
+	if( !req.body.name || !req.body.nib ||  !req.body.cardType || !req.body.validity ||!req.body.pass) {
 		var out = {};
 		out.error = "Bad request";
 		respondToJSON( req, res, out, 400 );
@@ -75,6 +75,8 @@ app.post('/client/create',function (req,res) {
 	else
 	{
 		client.nib = req.body.nib;
+		client.cardType=req.body.cardType;
+		client.validity=req.body.validity;
 		db.createClient(client,req.body.pass, function(err, lastID, row) {
 			var out = {},
 				code;
@@ -236,19 +238,19 @@ app.get('/list/:client', function (req, res) {
 // Comprar bilhetes
 // POST /buy PARAMS: cid:client id, t1:nr de t1s, t2:nr de t2s,t3:nr de t3s
 // returns {t1:21,t2:32,t3:43}
-app.post('/f', function (req, res) {
-//TODO
-	var cid = req.params.client;
+app.post('/buy', function (req, res) {
 
+	var cid = req.body.cid,t1=new Number(req.body.t1),t2=new Number(req.body.t2),t3=new Number(req.body.t3);
+	
 	// Verifica se todos os valores enviados sÃ£o inteiros e maiores que zero
 	// NÃ£o verifica se os cÃ³digos enviados existem na base de dados
-	if( !cid )
+	if( !cid ||!t1||!t2||!t3)
 		respondToJSON( req, res, {error: 'Bad request'}, 400 );
 
 	else {
 
-		db.listTickets(cid, function(err,result) {
-			var out = {},
+		db.buyTickets(cid,t1,t2,t3, function() {
+			var out = {},err,row="lol",
 				code;
 
 			if( err ) {
@@ -266,7 +268,7 @@ app.post('/f', function (req, res) {
 				else
 				{
 				
-					out=result;
+					out={lol:"lol"};
 					console.log('client tickets: ',cid, ' ',JSON.stringify( out ));
 				}
 			}
@@ -284,7 +286,7 @@ app.post('/f', function (req, res) {
 // returns {status:false/true}
 app.post('/fine', function (req, res) {
 //TODO
-	var cid = req.params.client;
+	var cid = req.body.client;
 
 	// Verifica se todos os valores enviados sÃ£o inteiros e maiores que zero
 	// NÃ£o verifica se os cÃ³digos enviados existem na base de dados

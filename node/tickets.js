@@ -38,7 +38,7 @@ function sqliteDB(file) {
 
 				// Cria as tabelas
 			
-				.run("CREATE TABLE clients (cid INTEGER PRIMARY KEY, name TEXT NOT NULL, nib TEXT NOT NULL, salt TEXT NOT NULL, pass TEXT NOT NULL);")
+				.run("CREATE TABLE clients (cid INTEGER PRIMARY KEY, name TEXT NOT NULL, nib TEXT NOT NULL, cardType TEXT NOT NULL, validity TEXT NOT NULL, salt TEXT NOT NULL, pass TEXT NOT NULL);")
 				.run("CREATE TABLE tickets (tid INTEGER PRIMARY KEY, type INTEGER NOT NULL,  cid REFERENCES clients(cid), dateValidated TEXT, dateBought TEXT NOT NULL, busId TEXT);")
 				.run("CREATE TABLE multas (mid INTEGER PRIMARY KEY, cid REFERENCES clients(cid), dateInfraction TEXT NOT NULL);")
 				// Insere os dados na db
@@ -57,8 +57,8 @@ sqliteDB.prototype.createClient=function(client,pass,callback)
 	if( typeof callback !== 'function')
 		throw new Error('Callback is not a function');
 	createHashPwd(pass,function(hashedPass,salt){
-		ticketConn.run("INSERT INTO clients (name,nib,salt,pass) VALUES (?,?,?,?);",
-		[client.name,client.nib,salt,hashedPass],
+		ticketConn.run("INSERT INTO clients (name,nib,cardType,validity,salt,pass) VALUES (?,?,?,?,?,?);",
+		[client.name,client.nib,client.cardType,client.validity,salt,hashedPass],
 		function(err){
 			console.log(pass," ",salt," ",hashedPass);
 			callback(err, this.lastID, this.changes);
@@ -136,6 +136,42 @@ sqliteDB.prototype.listTickets=function(clientID,callback)
 			callback(err,out);
 		});	
 }
+
+sqliteDB.prototype.buyTickets=function(clientID,t1,t2,t3,callback)
+{
+	console.log("buy tickets for ",clientID);
+	if ( typeof callback !== 'function')
+		throw new Error('Callback is not a function');	
+	var count,resto;
+	resto=t3%10;
+	count=t3-resto;
+	t3+=count/10;
+	count=resto+t2;
+	resto=count%10;
+	count=count-resto;
+	t2+=count/10;
+	count=resto+t1;
+	resto=count%10;
+	count=count-resto;
+	t1+=count/10;
+	var ts=timestamp();
+	for (var i=0;i<t3;i++)
+	{
+		ticketConn.run("INSERT INTO tickets (cid,type, dateBought) VALUES (?,3,?);",[clientID,ts]);
+	}
+	for (var j=0;j<t2;j++)
+	{
+		ticketConn.run("INSERT INTO tickets (cid,type, dateBought) VALUES (?,2,?);",[clientID,ts]);
+
+	}
+	for (var k=0;k<t1;k++)
+	{
+		ticketConn.run("INSERT INTO tickets (cid,type, dateBought) VALUES (?,1,?);",[clientID,ts]);
+
+	}
+	console.log("tickets + bonus: ",t1," ",t2," ",t3);
+	callback();
+}
  
 /*
  *	TICKET CLASS
@@ -159,6 +195,8 @@ function Client(name){
 	this.name=name;
 	this.tickets=[];
 	this.nib=null;
+	this.cardType=null;
+	this.validity=null;
 }
 
 
@@ -172,6 +210,10 @@ function Client(name){
 function timeNow()
 {
 	return ( new Date() / 1000 ) | 0 ;
+}
+
+function timestamp(){
+	return moment().format("YYYY-MM-DDTHH:mm:ss");
 }
 
 //createHashPwd
