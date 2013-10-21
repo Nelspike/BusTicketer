@@ -24,8 +24,7 @@ import bus.ticketer.utils.Method;
 public class CentralFragment extends Fragment {
 	public static final String ARG_OBJECT = "object";
 	private View rootView;
-	
-	
+
 	@SuppressLint("HandlerLeak")
 	private Handler threadConnectionHandler = new Handler() {
 		@Override
@@ -45,20 +44,20 @@ public class CentralFragment extends Fragment {
 
 			showTicketsHandler();
 
-			ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-			BasicNameValuePair one = new BasicNameValuePair("name",
-					"derpus");
-			BasicNameValuePair two = new BasicNameValuePair("nib", "123456");
-			BasicNameValuePair three = new BasicNameValuePair("pass",
-					"asdsad21iuo46tb");
-			params.add(one);
-			params.add(two);
-			params.add(three);
-
-			ConnectionThread dataThread = new ConnectionThread(
-					"http://192.168.0.136:81/client/create/", Method.POST,
-					params, threadConnectionHandler);
-			dataThread.start();
+//			ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+//			BasicNameValuePair one = new BasicNameValuePair("name",
+//					"derpus");
+//			BasicNameValuePair two = new BasicNameValuePair("nib", "123456");
+//			BasicNameValuePair three = new BasicNameValuePair("pass",
+//					"asdsad21iuo46tb");
+//			params.add(one);
+//			params.add(two);
+//			params.add(three);
+//
+//			ConnectionThread dataThread = new ConnectionThread(
+//					"http://192.168.0.136:81/client/create/", Method.POST,
+//					params, threadConnectionHandler);
+//			dataThread.start();
 			
 		} else if (args.getInt(ARG_OBJECT) == 2) {
 			rootView = inflater.inflate(R.layout.fragment_buy_tickets,
