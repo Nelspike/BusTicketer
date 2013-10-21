@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:enterFadeDuration="50"
-    android:exitFadeDuration="50" > 
-	<item android:state_checked="true" android:drawable="@drawable/selectedt1" />
-	<item android:state_checked="false" android:drawable="@drawable/t1" />
-</selector>

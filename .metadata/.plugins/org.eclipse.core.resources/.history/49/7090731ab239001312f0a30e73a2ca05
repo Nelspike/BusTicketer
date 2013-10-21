@@ -1,6 +1,0 @@
-package bus.ticketer.utils;
-
-public class Pair<K, V> {
-	private String key;
-	
-}

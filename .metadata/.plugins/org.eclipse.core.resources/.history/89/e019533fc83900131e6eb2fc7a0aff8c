@@ -1,5 +1,0 @@
-package bus.ticketer.connection;
-
-public class ConnectionThread {
-
-}

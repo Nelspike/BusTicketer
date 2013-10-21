@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring accessors="true" comment="Delete 2 elements from project &apos;PassengerMode&apos;&#x0D;&#x0A;- Original project: &apos;PassengerMode&apos;&#x0D;&#x0A;- Original elements:&#x0D;&#x0A;     bus.ticketer.passenger.BuyTicketsFragment.java&#x0D;&#x0A;     bus.ticketer.passenger.ShowTicketsFragment.java" description="Delete elements" element1="/src&lt;bus.ticketer.passenger{BuyTicketsFragment.java" element2="/src&lt;bus.ticketer.passenger{ShowTicketsFragment.java" elements="2" flags="589830" id="org.eclipse.jdt.ui.delete" resources="0" stamp="1382370212913" subPackages="false" version="1.0"/>
-</session>
