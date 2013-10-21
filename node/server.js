@@ -134,7 +134,7 @@ app.post('/client/login',function (req,res) {
 				
 					out.id=row.cid;
 					out.name=row.name;
-					console.log('Login client: ' +name);
+					console.log('Logged in : ' +name);
 				}
 			}
 
@@ -144,28 +144,189 @@ app.post('/client/login',function (req,res) {
 	}
 
 });
+
+
+//validar um bilhete
+//POST /validate PARAMS: cid:client id, tid:ticket id, bid:bus id
+//Return JSON {status:true/false}
+app.post('/validate',function(req,res){
+	if( !req.body.tid ||!req.body.cid||!req.body.bid)
+		respondToJSON( req, res, {error: 'Bad request'}, 400 );
+	else
+	{
+		var cid=req.body.cid,tid=req.body.tid,bid=req.body.bid;
+		db.validate(cid,bid,tid, function(err,row) {
+			var out = {},
+				code;
+
+			if( err ) {
+				code = 500;
+				out.error = 'Impossible to add client';
+				out.status=false;
+				console.log('Error validating ticket: ' + err);
+			}
+			else {
+				code = 200;
+				if (!row)
+				{
+					out.error = 'Wrong TICKET/USER';
+					out.status=false;
+					console.log('Fail validate: ',tid,' ',cid,' ',bid);
+				}
+				else
+				{
+				
+					out.status=true;
+					console.log('validate ticket: ',tid,' ',cid,' ',bid);
+				}
+			}
+
+			respondToJSON( req, res, out, code );
+		
+		});
+	}
+});
  
  // Retorna bilhetes de um cliente
+ // GET /list/:clientID PARAMS clientID: numeric client ID
+ //returns {t1:21,t2:32,t3:43}
 app.get('/list/:client', function (req, res) {
 
-	var client = req.params.client;
+	var cid = req.params.client;
 
-	// Verifica se todos os valores enviados são inteiros e maiores que zero
-	// Não verifica se os códigos enviados existem na base de dados
-	if( !client )
+	// Verifica se todos os valores enviados sÃ£o inteiros e maiores que zero
+	// NÃ£o verifica se os cÃ³digos enviados existem na base de dados
+	if( !cid )
 		respondToJSON( req, res, {error: 'Bad request'}, 400 );
 
 	else {
+
+		db.listTickets(cid, function(err,result) {
+			var out = {},
+				code;
+
+			if( err ) {
+				code = 500;
+				out.error = 'Impossible to list tickets for client';
+				console.log('Error listing tickets: ' + err);
+			}
+			else {
+				code = 200;
+				if (!result)
+				{
+					out.error = 'Wrong user';
+					console.log('Fail list tickets: ',cid);
+				}
+				else
+				{
+				
+					out=result;
+					console.log('client tickets: ',cid, ' ',JSON.stringify( out ));
+				}
+			}
+
+			respondToJSON( req, res, out, code );
 		
-		var out = {};
-		respondToJSON( req, res, out, 200 );
+		});
+		
+	}
+});
+
+
+// Comprar bilhetes
+// POST /buy PARAMS: cid:client id, t1:nr de t1s, t2:nr de t2s,t3:nr de t3s
+// returns {t1:21,t2:32,t3:43}
+app.post('/f', function (req, res) {
+//TODO
+	var cid = req.params.client;
+
+	// Verifica se todos os valores enviados sÃ£o inteiros e maiores que zero
+	// NÃ£o verifica se os cÃ³digos enviados existem na base de dados
+	if( !cid )
+		respondToJSON( req, res, {error: 'Bad request'}, 400 );
+
+	else {
+
+		db.listTickets(cid, function(err,result) {
+			var out = {},
+				code;
+
+			if( err ) {
+				code = 500;
+				out.error = 'Impossible to list tickets for client';
+				console.log('Error listing tickets: ' + err);
+			}
+			else {
+				code = 200;
+				if (!row)
+				{
+					out.error = 'Wrong user';
+					console.log('Fail list tickets: ',cid);
+				}
+				else
+				{
+				
+					out=result;
+					console.log('client tickets: ',cid, ' ',JSON.stringify( out ));
+				}
+			}
+
+			respondToJSON( req, res, out, code );
+		
+		});
+		
+	}
+});
+
+
+// Multar client
+// POST /fine PARAMS: cid:client id
+// returns {status:false/true}
+app.post('/fine', function (req, res) {
+//TODO
+	var cid = req.params.client;
+
+	// Verifica se todos os valores enviados sÃ£o inteiros e maiores que zero
+	// NÃ£o verifica se os cÃ³digos enviados existem na base de dados
+	if( !cid )
+		respondToJSON( req, res, {error: 'Bad request'}, 400 );
+
+	else {
+
+		db.listTickets(cid, function(err,result) {
+			var out = {},
+				code;
+
+			if( err ) {
+				code = 500;
+				out.error = 'Impossible to list tickets for client';
+				console.log('Error listing tickets: ' + err);
+			}
+			else {
+				code = 200;
+				if (!row)
+				{
+					out.error = 'Wrong user';
+					console.log('Fail list tickets: ',cid);
+				}
+				else
+				{
+				
+					out=result;
+					console.log('client tickets: ',cid, ' ',JSON.stringify( out ));
+				}
+			}
+
+			respondToJSON( req, res, out, code );
+		
+		});
 		
 	}
 });
 
  app.all('*', function (req, res) {
 
-	console.log('Pedido n�o encontrado: ' + req.path + " [" + req.method + "]");
+	console.log('Pedido não encontrado: ' + req.path + " [" + req.method + "]");
 
 	respondToJSON( req, res, { error: 'Página não encontrada'}, 404 );
 });

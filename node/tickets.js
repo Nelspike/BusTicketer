@@ -39,8 +39,8 @@ function sqliteDB(file) {
 				// Cria as tabelas
 			
 				.run("CREATE TABLE clients (cid INTEGER PRIMARY KEY, name TEXT NOT NULL, nib TEXT NOT NULL, salt TEXT NOT NULL, pass TEXT NOT NULL);")
-				.run("CREATE TABLE tickets (tid INTEGER PRIMARY KEY, type INTEGER NOT NULL,  cid REFERENCES clients(cid), INTEGER dateValidated TEXT NOT NULL, dateBought TEXT NOT NULL);")
-				
+				.run("CREATE TABLE tickets (tid INTEGER PRIMARY KEY, type INTEGER NOT NULL,  cid REFERENCES clients(cid), dateValidated TEXT, dateBought TEXT NOT NULL, busId TEXT);")
+				.run("CREATE TABLE multas (mid INTEGER PRIMARY KEY, cid REFERENCES clients(cid), dateInfraction TEXT NOT NULL);")
 				// Insere os dados na db
 
 				//.run("INSERT INTO clients (name) VALUES ('Diogo'), ('Nelson');")
@@ -68,7 +68,7 @@ sqliteDB.prototype.createClient=function(client,pass,callback)
 
 sqliteDB.prototype.login=function(name,pass,callback)
 {
-	console.log("login client ",name);	
+	console.log("try login client: ",name);	
 	if( typeof callback !== 'function')
 		throw new Error('Callback is not a function');
 	ticketConn.all("SELECT cid,name,nib,salt,pass FROM clients WHERE name=?",
@@ -88,6 +88,54 @@ sqliteDB.prototype.login=function(name,pass,callback)
 	});
 }
 
+sqliteDB.prototype.validate=function(ticket,client,bus,callback)
+{
+	console.log("validate ticket ",ticket," client ",client);
+	if ( typeof callback !== 'function')
+		throw new Error('Callback is not a function');
+	ticketConn.all("SELECT tid FROM tickets WHERE tid=? AND cid=?",[ticket,client],
+		function (err,row) {
+			if (row && row.length > 0)
+			{
+				row=row[0];
+				ticketConn.run("UPDATE tickets SET dateValidated=?,busID=?, WHERE tid=? AND cid=?",[date,bus,ticket,client],
+					function(err)
+					{
+						console.log("validate db changes ",this.changes);
+						callback(err,this.changes);
+					});
+			}
+			else
+				callback(err,null);
+		});
+	
+}
+
+sqliteDB.prototype.listTickets=function(clientID,callback)
+{
+	console.log("list tickets for ",clientID);
+	if ( typeof callback !== 'function')
+		throw new Error('Callback is not a function');
+		
+	var out={};out.t1=0;out.t2=0;out.t3=0;
+	ticketConn.each("SELECT type FROM tickets WHERE cid=?",[clientID],
+		function (err,row) { //eachfunction
+			if (err)
+			{
+				console.log("each ticket error ",err);
+			}
+			else
+			{
+				if (row.type==1) out.t1++;
+				if (row.type==2) out.t2++;
+				if (row.type==3) out.t3++;
+			}
+		},
+		function(err,nrows)
+		{
+			callback(err,out);
+		});	
+}
  
 /*
  *	TICKET CLASS
@@ -99,6 +147,7 @@ function Ticket(type,client){
 	this.type=type;
 	this.dateValidated="";
 	this.dateBought="";
+	this.bus=null;
 }
 
 /*
