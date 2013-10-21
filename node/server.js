@@ -239,8 +239,8 @@ app.get('/list/:client', function (req, res) {
 // POST /buy PARAMS: cid:client id, t1:nr de t1s, t2:nr de t2s,t3:nr de t3s
 // returns {t1:21,t2:32,t3:43}
 app.post('/buy', function (req, res) {
-//TODO
-	var cid = req.params.client,t1=req.params.t1,t2=req.params.t2,t3=req.params.t3;
+
+	var cid = req.body.cid,t1=new Number(req.body.t1),t2=new Number(req.body.t2),t3=new Number(req.body.t3);
 	
 	// Verifica se todos os valores enviados sÃ£o inteiros e maiores que zero
 	// NÃ£o verifica se os cÃ³digos enviados existem na base de dados
@@ -249,8 +249,8 @@ app.post('/buy', function (req, res) {
 
 	else {
 
-		db.buyTickets(cid,t1,t2,t3, function(err,result) {
-			var out = {},
+		db.buyTickets(cid,t1,t2,t3, function() {
+			var out = {},err,row="lol",
 				code;
 
 			if( err ) {
@@ -268,7 +268,7 @@ app.post('/buy', function (req, res) {
 				else
 				{
 				
-					out=result;
+					out={lol:"lol"};
 					console.log('client tickets: ',cid, ' ',JSON.stringify( out ));
 				}
 			}

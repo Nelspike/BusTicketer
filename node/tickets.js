@@ -57,8 +57,8 @@ sqliteDB.prototype.createClient=function(client,pass,callback)
 	if( typeof callback !== 'function')
 		throw new Error('Callback is not a function');
 	createHashPwd(pass,function(hashedPass,salt){
-		ticketConn.run("INSERT INTO clients (name,nib,salt,pass) VALUES (?,?,?,?);",
-		[client.name,client.nib,salt,hashedPass],
+		ticketConn.run("INSERT INTO clients (name,nib,cardType,validity,salt,pass) VALUES (?,?,?,?,?,?);",
+		[client.name,client.nib,client.cardType,client.validity,salt,hashedPass],
 		function(err){
 			console.log(pass," ",salt," ",hashedPass);
 			callback(err, this.lastID, this.changes);
@@ -154,9 +154,23 @@ sqliteDB.prototype.buyTickets=function(clientID,t1,t2,t3,callback)
 	resto=count%10;
 	count=count-resto;
 	t1+=count/10;
-	
+	var ts=timestamp();
+	for (var i=0;i<t3;i++)
+	{
+		ticketConn.run("INSERT INTO tickets (cid,type, dateBought) VALUES (?,3,?);",[clientID,ts]);
+	}
+	for (var j=0;j<t2;j++)
+	{
+		ticketConn.run("INSERT INTO tickets (cid,type, dateBought) VALUES (?,2,?);",[clientID,ts]);
+
+	}
+	for (var k=0;k<t1;k++)
+	{
+		ticketConn.run("INSERT INTO tickets (cid,type, dateBought) VALUES (?,1,?);",[clientID,ts]);
+
+	}
 	console.log("tickets + bonus: ",t1," ",t2," ",t3);
-	
+	callback();
 }
  
 /*
