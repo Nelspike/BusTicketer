@@ -41,7 +41,7 @@ public class SpinnerAdapter extends ArrayAdapter<String> {
 		label.setText(strings[position]);
 
 		ImageView icon = (ImageView) row.findViewById(R.id.spinner_image);
-		icon.setImageResource(images[0]);
+		icon.setImageResource(images[position]);
 
 		return row;
 	}
