@@ -65,18 +65,17 @@ function respondToJSON(req, res, out, statusCode) {
 //RETURN JSON {name:<clientname>,id:<clientid>}
 app.post('/client/create',function (req,res) {
 	//console.log(req);
-	var client = new dbLib.Client(req.query.name);
-	if( !req.query.name || !req.query.nib || !req.query.pass) {
+	var client = new dbLib.Client(req.body.name);
+	if( !req.body.name || !req.body.nib || !req.body.pass) {
 		var out = {};
 		out.error = "Bad request";
-		
 		respondToJSON( req, res, out, 400 );
 		
 	}
 	else
 	{
-		client.nib = req.query.nib;
-		db.createClient(client,req.query.pass, function(err, lastID, row) {
+		client.nib = req.body.nib;
+		db.createClient(client,req.body.pass, function(err, lastID, row) {
 			var out = {},
 				code;
 
