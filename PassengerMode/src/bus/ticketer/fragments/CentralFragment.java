@@ -43,9 +43,6 @@ public class CentralFragment extends Fragment {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (currentFunction) {
-				case GET_CLIENT_TICKETS:
-					//handleGetTickets(msg);
-					break;
 				case BUY_CLIENT_TICKETS_CLICK:
 					handlePurchase(msg);
 					break;
@@ -86,8 +83,8 @@ public class CentralFragment extends Fragment {
 			getTicketInfo(1);
 			buyTicketsHandler();
 		} else {
-		}
-				
+			//To Handle Later
+		}		
 	}
 	
 	public void getTicketInfo(int i) {

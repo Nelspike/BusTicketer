@@ -38,10 +38,7 @@ public class ConnectionThread extends Thread {
 	}
 
 	@Override
-	public void run() {
-		if(view != null)
-			System.out.println("here " + view.findViewById(R.id.ticket_radio));
-				
+	public void run() {				
 		runConnection.run();
 		threadMsg();
 		fillList();

@@ -71,10 +71,5 @@ public class CentralPagerAdapter extends FragmentStatePagerAdapter {
 	 public Parcelable saveState() {
 	     return null;
 	 }
-
-//	 @Override
-//	 public int getItemPosition(Object object) {
-//	     return POSITION_NONE;
-//	 }
 	
 }

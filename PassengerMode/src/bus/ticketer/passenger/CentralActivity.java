@@ -29,8 +29,7 @@ public class CentralActivity extends FragmentActivity {
 		mViewPager.setOffscreenPageLimit(0);
 		mViewPager.setAdapter(mCentralActivity);
 
-		mViewPager
-				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 					@Override
 					public void onPageSelected(int position) {
 						((CentralFragment)((CentralPagerAdapter) mViewPager.getAdapter()).instantiateItem(mViewPager, position)).refresh();
