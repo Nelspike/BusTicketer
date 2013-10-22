@@ -88,20 +88,24 @@ sqliteDB.prototype.login=function(name,pass,callback)
 	});
 }
 
-sqliteDB.prototype.validate=function(ticket,client,bus,callback)
+sqliteDB.prototype.validate=function(type,client,bus,callback)
 {
-	console.log("validate ticket ",ticket," client ",client);
+	console.log("validate ticket ",type," client ",client);
 	if ( typeof callback !== 'function')
 		throw new Error('Callback is not a function');
-	ticketConn.all("SELECT tid FROM tickets WHERE tid=? AND cid=?",[ticket,client],
+	ticketConn.get("SELECT tid FROM tickets WHERE type=? AND cid=? AND busID IS NULL",[type,client],
 		function (err,row) {
-			if (row && row.length > 0)
+			if (row)
 			{
-				row=row[0];
-				ticketConn.run("UPDATE tickets SET dateValidated=?,busID=?, WHERE tid=? AND cid=?",[date,bus,ticket,client],
+				//console.log(JSON.stringify(row));
+				
+				var date=timestamp();
+				var ticket=row.tid;
+				ticketConn.run("UPDATE tickets SET dateValidated=?,busID=? WHERE tid=?",[date,bus,ticket],
 					function(err)
 					{
-						console.log("validate db changes ",this.changes);
+						if (!err)console.log("validate db changes ",this.changes);
+						else console.log("validate db error");
 						callback(err,this.changes);
 					});
 			}
@@ -118,7 +122,7 @@ sqliteDB.prototype.listTickets=function(clientID,callback)
 		throw new Error('Callback is not a function');
 		
 	var out={};out.t1=0;out.t2=0;out.t3=0;
-	ticketConn.each("SELECT type FROM tickets WHERE cid=?",[clientID],
+	ticketConn.each("SELECT type FROM tickets WHERE cid=? AND busID is NULL",[clientID],
 		function (err,row) { //eachfunction
 			if (err)
 			{
@@ -135,6 +139,58 @@ sqliteDB.prototype.listTickets=function(clientID,callback)
 		{
 			callback(err,out);
 		});	
+}
+
+sqliteDB.prototype.getValidated=function(busId,callback)
+{
+	if ( typeof callback !== 'function')
+		throw new Error('Callback is not a function');	
+	
+	console.log("get validated for ",busId);
+	var out=[];
+	var time1=moment().subtract('minutes',15).format("YYYY-MM-DDTHH:mm:ss");
+	var time2=moment().subtract('minutes',30).format("YYYY-MM-DDTHH:mm:ss");
+	var time3=moment().subtract('minutes',45).format("YYYY-MM-DDTHH:mm:ss");
+	ticketConn.serialize(function(){
+		console.log("x1");
+		ticketConn.all("SELECT cid,dateValidated FROM tickets WHERE type=3 AND busID=? AND dateValidated>?",[busId,time3],
+		function (err,row) {
+			if (row && !err)
+			{
+				console.log("validated t3 ",JSON.stringify(row));
+				for (var i=0;i<row.length;i++)
+				{
+					out.push(row[i].cid);
+				}
+			}
+			else
+				console.log("error get validated t3: ",err);
+		});
+		ticketConn.all("SELECT cid,dateValidated FROM tickets WHERE type=2 AND busID=? AND dateValidated>?",[busId,time2],
+		function (err,row) {
+			if (row && !err)
+			{
+				console.log("validated t2 ",JSON.stringify(row));
+				for (var i=0;i<row.length;i++)
+					out.push(row[i].cid);
+			}
+			else
+				console.log("error get validated t2: ",err);
+		});
+		ticketConn.all("SELECT cid,dateValidated FROM tickets WHERE type=1 AND busID=? AND dateValidated>?",[busId,time1],
+		function (err,row) {
+			if (row && !err)
+			{
+			
+				console.log("validated t1",JSON.stringify(row));
+				for (var i=0;i<row.length;i++)
+					out.push(row[i].cid);
+			}
+			else
+				console.log("error get validated t1: ",err);
+			callback(out);
+		});
+	});
 }
 
 sqliteDB.prototype.buyTickets=function(clientID,t1,t2,t3,callback)
@@ -155,22 +211,44 @@ sqliteDB.prototype.buyTickets=function(clientID,t1,t2,t3,callback)
 	count=count-resto;
 	t1+=count/10;
 	var ts=timestamp();
-	for (var i=0;i<t3;i++)
-	{
-		ticketConn.run("INSERT INTO tickets (cid,type, dateBought) VALUES (?,3,?);",[clientID,ts]);
-	}
-	for (var j=0;j<t2;j++)
-	{
-		ticketConn.run("INSERT INTO tickets (cid,type, dateBought) VALUES (?,2,?);",[clientID,ts]);
-
-	}
-	for (var k=0;k<t1;k++)
-	{
-		ticketConn.run("INSERT INTO tickets (cid,type, dateBought) VALUES (?,1,?);",[clientID,ts]);
-
-	}
+	
+	var out={};out.t1=0;out.t2=0;out.t3=0;
 	console.log("tickets + bonus: ",t1," ",t2," ",t3);
-	callback();
+	ticketConn.serialize(function(){
+		ticketConn.parallelize(function(){
+			for (var i=0;i<t3;i++)
+			{
+				ticketConn.run("INSERT INTO tickets (cid,type, dateBought) VALUES (?,3,?);",[clientID,ts]);
+			}
+			for (var j=0;j<t2;j++)
+			{
+				ticketConn.run("INSERT INTO tickets (cid,type, dateBought) VALUES (?,2,?);",[clientID,ts]);
+
+			}
+			for (var k=0;k<t1;k++)
+			{
+				ticketConn.run("INSERT INTO tickets (cid,type, dateBought) VALUES (?,1,?);",[clientID,ts]);
+
+			}
+		});
+		ticketConn.each("SELECT type FROM tickets WHERE cid=?",[clientID],
+			function (err,row) { //eachfunction
+				if (err)
+				{
+					console.log("each ticket error ",err);
+				}
+				else
+				{
+					if (row.type==1) out.t1++;
+					if (row.type==2) out.t2++;
+					if (row.type==3) out.t3++;
+				}
+			},
+			function(err,nrows)
+			{
+				callback(err,out);
+			});	
+	});
 }
  
 /*

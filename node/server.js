@@ -149,15 +149,15 @@ app.post('/client/login',function (req,res) {
 
 
 //validar um bilhete
-//POST /validate PARAMS: cid:client id, tid:ticket id, bid:bus id
+//POST /validate PARAMS: cid:client id, type:ticket type, bid:bus id
 //Return JSON {status:true/false}
 app.post('/validate',function(req,res){
-	if( !req.body.tid ||!req.body.cid||!req.body.bid)
+	if( !req.body.type ||!req.body.cid||!req.body.bid)
 		respondToJSON( req, res, {error: 'Bad request'}, 400 );
 	else
 	{
-		var cid=req.body.cid,tid=req.body.tid,bid=req.body.bid;
-		db.validate(cid,bid,tid, function(err,row) {
+		var cid=req.body.cid,type=req.body.type,bid=req.body.bid;
+		db.validate(type,cid,bid, function(err,row) {
 			var out = {},
 				code;
 
@@ -173,13 +173,13 @@ app.post('/validate',function(req,res){
 				{
 					out.error = 'Wrong TICKET/USER';
 					out.status=false;
-					console.log('Fail validate: ',tid,' ',cid,' ',bid);
+					console.log('Fail validate: ',type,' ',cid,' ',bid);
 				}
 				else
 				{
 				
 					out.status=true;
-					console.log('validate ticket: ',tid,' ',cid,' ',bid);
+					console.log('validate ticket: ',type,' ',cid,' ',bid);
 				}
 			}
 
@@ -249,27 +249,24 @@ app.post('/buy', function (req, res) {
 
 	else {
 
-		db.buyTickets(cid,t1,t2,t3, function() {
-			var out = {},err,row="lol",
-				code;
+		db.buyTickets(cid,t1,t2,t3, function(err,out) {
+			var code;
 
 			if( err ) {
 				code = 500;
-				out.error = 'Impossible to list tickets for client';
+				out.error = 'Impossible to buys tickets for client';
 				console.log('Error listing tickets: ' + err);
 			}
 			else {
 				code = 200;
-				if (!row)
+				if (!out)
 				{
 					out.error = 'Wrong user';
-					console.log('Fail list tickets: ',cid);
+					console.log('Fail buy tickets: ',cid);
 				}
 				else
 				{
-				
-					out={lol:"lol"};
-					console.log('client tickets: ',cid, ' ',JSON.stringify( out ));
+					console.log('client tickets after buy: ',cid, ' ',JSON.stringify( out ));
 				}
 			}
 
@@ -277,6 +274,35 @@ app.post('/buy', function (req, res) {
 		
 		});
 		
+	}
+});
+
+
+//verificar bilhetes validados num terminal
+//GET /validated/:busId PARAMS busId=id do terminal de validacao
+//returns json array client IDs [1,2,4]
+app.get("/validated/:busId",function(req,res){
+	var busId=req.params.busId;
+	if (!busId)
+		respondToJSON( req, res, {error: 'Bad request'}, 400 );
+	else {
+		db.getValidated(busId,function(rows){
+			var code = 200;
+			var out={};
+			if (!rows)
+			{
+				out.error = 'Something went wrong getting validated';
+				console.log('Fail get validated tickets: ',busId);
+			}
+			else
+			{
+				out.list=rows;
+				console.log('validated clients: ',busId, ' ',JSON.stringify( out ));
+			}
+			
+
+			respondToJSON( req, res, out, code );
+		});
 	}
 });
 
