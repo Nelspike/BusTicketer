@@ -1,0 +1,10 @@
+package bus.ticketer.utils;
+
+public enum RESTFunction {
+	CREATE_CLIENT,
+	LOGIN_CLIENT,
+	VALIDATE_TICKET,
+	GET_CLIENT_TICKETS,
+	BUY_CLIENT_TICKETS,
+	FINE_CLIENT;
+}

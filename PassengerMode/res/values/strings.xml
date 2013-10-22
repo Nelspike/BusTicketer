@@ -29,5 +29,6 @@
         <item>American Express</item>
         <item>Multibanco</item>
     </string-array>
+    <string name="slash_string">/</string>
 
 </resources>
