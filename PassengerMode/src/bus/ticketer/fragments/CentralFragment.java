@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -35,65 +36,73 @@ public class CentralFragment extends Fragment {
 	private View rootView;
 	private RESTFunction currentFunction;
 	private ArrayList<Integer> tickets = new ArrayList<Integer>();
+	private int t1Bought, t2Bought, t3Bought;
 
 	@SuppressLint("HandlerLeak")
 	private Handler threadConnectionHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			System.out.println(msg.obj.toString());
 			switch (currentFunction) {
-			case GET_CLIENT_TICKETS:
-				handleGetTickets(msg);
-				break;
-			case BUY_CLIENT_TICKETS:
-				//handlePurchase(msg);
-				break;
-			default:
-				break;
+				case GET_CLIENT_TICKETS:
+					//handleGetTickets(msg);
+					break;
+				case BUY_CLIENT_TICKETS_CLICK:
+					handlePurchase(msg);
+					break;
+				default:
+					break;
 			}
 		}
 	};
 
-	@SuppressLint("UseSparseArrays")
 	@Override
-	public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-			Bundle savedInstanceState) {
-
-		/*ProgressDialog progDialog = ProgressDialog.show(getActivity(),
-				"", "Loading, please wait!",
-				false);
-
-		progDialog.setOnDismissListener(new OnDismissListener() {
-
-			@Override
-			public void onDismiss(DialogInterface dialog) {*/
-				handleFragments(inflater, container);
-		/*	}
-		});
-		
-		getTicketInfo(progDialog);*/
-		return rootView;
-	}
-
-	private void handleFragments(LayoutInflater inflater, ViewGroup container) {
+	public View onCreateView(LayoutInflater inflater,
+			ViewGroup container, Bundle savedInstanceState) {
 		
 		Bundle args = getArguments();
-		tickets = args.getIntegerArrayList(SPARSE);
-		
-		if (args.getInt(ARG_OBJECT) == 1) {
+		if (args.getInt(ARG_OBJECT) == 0) {
 			rootView = inflater.inflate(R.layout.fragment_show_tickets,
 					container, false);
-			showTicketsHandler();
-
-		} else if (args.getInt(ARG_OBJECT) == 2) {
+			getTicketInfo(0);
+		} else if (args.getInt(ARG_OBJECT) == 1) {
 			rootView = inflater.inflate(R.layout.fragment_buy_tickets,
 					container, false);
 
+			getTicketInfo(1);
 			buyTicketsHandler();
 		} else {
 			rootView = inflater.inflate(R.layout.fragment_history_tickets,
 					container, false);
 		}
+		
+		return rootView;
+	}
+	
+	public void refresh() {
+		Bundle args = getArguments();
+		if (args.getInt(ARG_OBJECT) == 0) {
+			getTicketInfo(0);
+		} else if (args.getInt(ARG_OBJECT) == 1) {
+			getTicketInfo(1);
+			buyTicketsHandler();
+		} else {
+		}
+				
+	}
+	
+	public void getTicketInfo(int i) {
+		FileHandler fHandler = new FileHandler("client.txt", "");
+		ArrayList<String> fileContents = fHandler.readFromFile();
+
+		if(i == 0)
+			currentFunction = RESTFunction.GET_CLIENT_TICKETS;
+		else
+			currentFunction = RESTFunction.BUY_CLIENT_TICKETS;
+		ConnectionThread dataThread = new ConnectionThread(
+				"http://192.168.0.136:81/list/" + fileContents.get(2),
+				Method.GET, null, threadConnectionHandler, null,
+				currentFunction, rootView);
+		dataThread.start();
 	}
 	
 	public void showTicketsHandler() {
@@ -125,17 +134,6 @@ public class CentralFragment extends Fragment {
 	}
 
 	public void buyTicketsHandler() {
-
-		TextView t1TicketsQuantity = (TextView) rootView
-				.findViewById(R.id.t1_ticket_quantity);
-		TextView t2TicketsQuantity = (TextView) rootView
-				.findViewById(R.id.t2_ticket_quantity);
-		TextView t3TicketsQuantity = (TextView) rootView
-				.findViewById(R.id.t3_ticket_quantity);
-
-		t1TicketsQuantity.setText(tickets.get(0) + "");
-		t2TicketsQuantity.setText(tickets.get(1) + "");
-		t3TicketsQuantity.setText(tickets.get(2) + "");
 
 		Button t1Minus = (Button) rootView.findViewById(R.id.t1_ticket_minus);
 		Button t2Minus = (Button) rootView.findViewById(R.id.t2_ticket_minus);
@@ -255,50 +253,49 @@ public class CentralFragment extends Fragment {
 
 					@Override
 					public void onDismiss(DialogInterface dialog) {
-						getActivity().finish();
+						purchaseSuccess();
 					}
 				});
 				
-				currentFunction = RESTFunction.BUY_CLIENT_TICKETS;
+				currentFunction = RESTFunction.BUY_CLIENT_TICKETS_CLICK;
 				ConnectionThread dataThread = new ConnectionThread(
 						"http://192.168.0.136:81/buy/", Method.POST,
-						params, threadConnectionHandler, progDialog);
+						params, threadConnectionHandler, progDialog,
+						currentFunction, rootView);
 				dataThread.start();
 			}
 
 		});
 	}
 	
-	public void getTicketInfo(ProgressDialog progDialog) {
-		FileHandler fHandler = new FileHandler("client.txt", "");
-		ArrayList<String> fileContents = fHandler.readFromFile();
+	private void purchaseSuccess() {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
 
-		currentFunction = RESTFunction.GET_CLIENT_TICKETS;
-		ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/list/"+fileContents.get(2), Method.GET, null, threadConnectionHandler, progDialog);
-		dataThread.start();
+		alertDialogBuilder.setTitle("Purchase succeeded!");
+
+		alertDialogBuilder
+		.setMessage("You now have: " + t1Bought + " T1 Tickets, " + t2Bought + " T2 Tickets and " + t3Bought + " T3 Tickets")
+		.setCancelable(false)
+		.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog,int id) {
+		        refresh();
+			}
+		});
+
+		AlertDialog alertDialog = alertDialogBuilder.create();
+		alertDialog.show();		
 	}
 
-	private void handleGetTickets(Message msg) {
-		JSONObject ticketListing = (JSONObject) msg.obj;
-		try {
-			tickets.add(ticketListing.getInt("t1"));
-			tickets.add(ticketListing.getInt("t2"));
-			tickets.add(ticketListing.getInt("t3"));
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
 	
-	/*private void handlePurchase(Message msg) {
-		JSONObject ticketListing = (JSONObject) msg.obj;
-		
-		try {
-			t1Bought = ticketListing.getInt("t1");
-			t2Bought = ticketListing.getInt("t2");
-			t3Bought = ticketListing.getInt("t3");
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}*/
-
+	private void handlePurchase(Message msg) {
+        JSONObject ticketListing = (JSONObject) msg.obj;
+        
+        try {
+            t1Bought = ticketListing.getInt("t1");
+            t2Bought = ticketListing.getInt("t2");
+            t3Bought = ticketListing.getInt("t3");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+	}
 }

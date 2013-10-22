@@ -38,7 +38,6 @@ public class MainActivity extends Activity {
 	private Handler threadConnectionHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			
 			switch(currentFunction) {
 				case CREATE_CLIENT:
 					handleCreation(msg);
@@ -51,13 +50,6 @@ public class MainActivity extends Activity {
 			}
 		}
 	};
-	
-	@Override
-	protected void onResume() {
-		super.onResume();
-		setContentView(R.layout.clean_layout);
-		handleInitialization();
-	}
 	
     @SuppressLint("InlinedApi")
 	@Override
@@ -116,23 +108,25 @@ public class MainActivity extends Activity {
 		params.add(new BasicNameValuePair("validity", validity));
 
 		currentFunction = RESTFunction.CREATE_CLIENT;
-		ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/create/", Method.POST,params, threadConnectionHandler, progDialog);
+		ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/create/", Method.POST,params, threadConnectionHandler, progDialog, currentFunction, null);
 		dataThread.start();
     }
     
     public void handleInitialization() {
         ArrayList<String> fileContents = fHandler.readFromFile();
-        
+                
         if(fileContents.size() != 0) {
         	
     		ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
     		params.add(new BasicNameValuePair("name", fileContents.get(0)));
     		params.add(new BasicNameValuePair("pass", fileContents.get(1)));
-        	
+    		
     		currentFunction = RESTFunction.LOGIN_CLIENT;
-        	ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/login/", Method.POST, params, threadConnectionHandler, progDialog);
+        	ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/login/", Method.POST, params, threadConnectionHandler, progDialog, currentFunction, null);
     		dataThread.start();
         }
+        else
+        	progDialog.dismiss();
     }
 
 	private void handleCreation(Message msg) {
@@ -153,7 +147,7 @@ public class MainActivity extends Activity {
 	}
     
 	private void handleLogin(Message msg) {
-		JSONObject received = (JSONObject) msg.obj;
+		JSONObject received = (JSONObject) msg.obj;	
 		
 		try {
 			received.getString("error");

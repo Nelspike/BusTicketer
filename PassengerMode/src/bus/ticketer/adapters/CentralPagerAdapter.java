@@ -4,34 +4,33 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.View;
 import bus.ticketer.fragments.CentralFragment;
+import bus.ticketer.passenger.R;
 
 public class CentralPagerAdapter extends FragmentStatePagerAdapter {
 
-	private int nSwipes = 3;
-	private ArrayList<Integer> tickets = new ArrayList<Integer>();
+	private int nSwipes = 2;
+	private ArrayList<Fragment> fragments = new ArrayList<Fragment>();
 	
-	public CentralPagerAdapter(FragmentManager fm, ArrayList<Integer> c) {
+	public CentralPagerAdapter(FragmentManager fm) {
 		super(fm);
-		tickets = c;
 	}
 
 	@Override
 	public Fragment getItem(int i) {
-		Fragment fragment = new CentralFragment();		
+		Fragment fragment = new CentralFragment();
 		Bundle args = new Bundle();
-		args.putInt(CentralFragment.ARG_OBJECT, i + 1);
-		args.putIntegerArrayList(CentralFragment.SPARSE, tickets);
+		args.putInt(CentralFragment.ARG_OBJECT, i);
 		fragment.setArguments(args);
+		fragments.add(fragment);
 		return fragment;
-	}
-	
-	@Override
-	public int getItemPosition(Object object) {
-	    return POSITION_NONE;
 	}
 
 	@Override
@@ -39,8 +38,43 @@ public class CentralPagerAdapter extends FragmentStatePagerAdapter {
 		return nSwipes;
 	}
 	
-	public void setTickets(ArrayList<Integer> ti) {
-		tickets = ti;
-	}
+	 @Override
+	 public Object instantiateItem(View collection, int position) {
+		 System.out.println("I'm in " + position);
+         LayoutInflater inflater = (LayoutInflater) collection.getContext()
+                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+         int resId = 0;
+         switch (position) {
+         case 0:
+             resId = R.layout.fragment_show_tickets;
+             break;
+         case 1:
+             resId = R.layout.fragment_buy_tickets;
+             break;
+         case 2:
+             resId = R.layout.fragment_history_tickets;
+             break;
+         }
+         
+         View view = inflater.inflate(resId, null);
+         ((ViewPager) collection).addView(view, 0);
+         return view;
+     }
+	 
+	 @Override
+	 public void destroyItem(View collection, int position, Object view) {
+		 fragments.remove(position);
+		 ((ViewPager) collection).removeViewAt(position);
+	 }
 
+	 @Override
+	 public Parcelable saveState() {
+	     return null;
+	 }
+
+//	 @Override
+//	 public int getItemPosition(Object object) {
+//	     return POSITION_NONE;
+//	 }
+	
 }

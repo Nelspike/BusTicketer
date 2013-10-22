@@ -147,7 +147,6 @@ app.post('/client/login',function (req,res) {
 
 });
 
-
 //validar um bilhete
 //POST /validate PARAMS: cid:client id, type:ticket type, bid:bus id
 //Return JSON {status:true/false}
