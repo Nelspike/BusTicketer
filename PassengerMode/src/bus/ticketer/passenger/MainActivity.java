@@ -13,6 +13,7 @@ import android.os.Message;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.text.method.ScrollingMovementMethod;
@@ -31,6 +32,7 @@ public class MainActivity extends Activity {
 	private String toFile = "";
 	private FileHandler fHandler = new FileHandler("client.txt", toFile);
 	private RESTFunction currentFunction;
+	ProgressDialog progDialog;
 
 	@SuppressLint("HandlerLeak")
 	private Handler threadConnectionHandler = new Handler() {
@@ -50,14 +52,25 @@ public class MainActivity extends Activity {
 		}
 	};
 	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		setContentView(R.layout.clean_layout);
+		handleInitialization();
+	}
+	
     @SuppressLint("InlinedApi")
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(android.R.style.Theme_Holo_NoActionBar);
-        setContentView(R.layout.activity_main);
+        
+		progDialog = ProgressDialog.show(
+				MainActivity.this, "",
+				"Loading, please wait!", true);
         
         handleInitialization();
+        setContentView(R.layout.activity_main);
         
         TextView text = (TextView) findViewById(R.id.terms_textbox);
         text.setMovementMethod(new ScrollingMovementMethod());
@@ -103,7 +116,7 @@ public class MainActivity extends Activity {
 		params.add(new BasicNameValuePair("validity", validity));
 
 		currentFunction = RESTFunction.CREATE_CLIENT;
-		ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/create/", Method.POST,params, threadConnectionHandler);
+		ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/create/", Method.POST,params, threadConnectionHandler, progDialog);
 		dataThread.start();
     }
     
@@ -117,7 +130,7 @@ public class MainActivity extends Activity {
     		params.add(new BasicNameValuePair("pass", fileContents.get(1)));
         	
     		currentFunction = RESTFunction.LOGIN_CLIENT;
-        	ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/login/", Method.POST, params, threadConnectionHandler);
+        	ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/login/", Method.POST, params, threadConnectionHandler, progDialog);
     		dataThread.start();
         }
     }

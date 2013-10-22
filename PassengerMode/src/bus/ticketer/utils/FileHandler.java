@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import android.os.Environment;
-import android.util.Log;
 
 public class FileHandler {
 
@@ -27,7 +26,6 @@ public class FileHandler {
 						.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS),
 				filename);
 		if (!file.mkdirs()) {
-			Log.e("No file", "Directory not created");
 		}
 		return file;
 	}
