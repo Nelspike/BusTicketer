@@ -12,9 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
@@ -22,15 +20,16 @@ import android.view.View;
 import android.view.View.*;
 import android.widget.*;
 
+import bus.ticketer.adapters.DialogAdapter;
+import bus.ticketer.adapters.SpinnerAdapter;
 import bus.ticketer.connection.ConnectionThread;
 import bus.ticketer.utils.*;
-import bus.ticketer.utils.SpinnerAdapter;
 
 public class MainActivity extends Activity {
 
 	private String password = "";
 	private String toFile = "";
-	private FileHandler fHandler = new FileHandler("client.txt", toFile);
+	private FileHandler fHandler;
 	private RESTFunction currentFunction;
 	ProgressDialog progDialog;
 
@@ -57,33 +56,39 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setTheme(android.R.style.Theme_Holo_NoActionBar);
         
-		progDialog = ProgressDialog.show(
-				MainActivity.this, "",
-				"Loading, please wait!", true);
-        
-        handleInitialization();
-        setContentView(R.layout.activity_main);
-        
-        TextView text = (TextView) findViewById(R.id.terms_textbox);
-        text.setMovementMethod(new ScrollingMovementMethod());
-        
-        String[] cardTypes = { "Visa", "Visa Electron", "Master Card", "Meastro",
-        						"American Express", "Multibanco" };
-        
-        int[] images = { R.drawable.ico_home_visa, R.drawable.ico_home_visa_electron, R.drawable.ico_home_master_card, R.drawable.ico_home_maestro,
-        					R.drawable.ico_home_american_express, R.drawable.ico_home_multibanco};
-        
-        final Spinner spinner = (Spinner) findViewById(R.id.cc_type_spinner);
-        spinner.setAdapter(new SpinnerAdapter(MainActivity.this, R.layout.spinner_cc_choice_box, cardTypes, images));
-        
-        Button registerButton = (Button) findViewById(R.id.splash_register_button);
-        registerButton.setOnClickListener(new OnClickListener() {
-			
-			@Override
-				public void onClick(View v) {
-					registerAction(spinner);
-				}
-		});
+        if(!((BusTicketer) MainActivity.this.getApplication()).isNetworkAvailable())
+        	((BusTicketer) MainActivity.this.getApplication()).networkPrompt();
+        else {
+        	fHandler = new FileHandler(((BusTicketer) MainActivity.this.getApplication()).getClientFilename(), toFile);
+			progDialog = ProgressDialog.show(
+					MainActivity.this, "",
+					"Loading, please wait!", true);
+	        
+	        handleInitialization();
+	        setContentView(R.layout.activity_main);
+	        
+	        TextView text = (TextView) findViewById(R.id.terms_textbox);
+	        text.setMovementMethod(new ScrollingMovementMethod());
+	        
+	        String resource = "cc_type_spinner_vals";
+	        int id = getResources().getIdentifier(resource, "array", "bus.ticketer.passenger");
+	        String[] cardTypes = getResources().getStringArray(id);
+	        
+	        int[] images = { R.drawable.ico_home_visa, R.drawable.ico_home_visa_electron, R.drawable.ico_home_master_card, R.drawable.ico_home_maestro,
+	        					R.drawable.ico_home_american_express, R.drawable.ico_home_multibanco};
+	        
+	        final Spinner spinner = (Spinner) findViewById(R.id.cc_type_spinner);
+	        spinner.setAdapter(new SpinnerAdapter(MainActivity.this, R.layout.spinner_cc_choice_box, cardTypes, images));
+	        
+	        Button registerButton = (Button) findViewById(R.id.splash_register_button);
+	        registerButton.setOnClickListener(new OnClickListener() {
+				
+				@Override
+					public void onClick(View v) {
+						registerAction(spinner);
+					}
+			});
+        }
     }
     
     private void registerAction(Spinner cardSpinner) {
@@ -108,7 +113,7 @@ public class MainActivity extends Activity {
 		params.add(new BasicNameValuePair("validity", validity));
 
 		currentFunction = RESTFunction.CREATE_CLIENT;
-		ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/create/", Method.POST,params, threadConnectionHandler, progDialog, currentFunction, null);
+		ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/create/", Method.POST,params, threadConnectionHandler, progDialog, currentFunction, null, this);
 		dataThread.start();
     }
     
@@ -122,7 +127,7 @@ public class MainActivity extends Activity {
     		params.add(new BasicNameValuePair("pass", fileContents.get(1)));
     		
     		currentFunction = RESTFunction.LOGIN_CLIENT;
-        	ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/login/", Method.POST, params, threadConnectionHandler, progDialog, currentFunction, null);
+        	ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/login/", Method.POST, params, threadConnectionHandler, progDialog, currentFunction, null, this);
     		dataThread.start();
         }
         else
@@ -137,13 +142,13 @@ public class MainActivity extends Activity {
 			toFile += password + '\n';
 			toFile += received.getString("id");
 		} catch (JSONException e) {
-			dialogYesNoShowing("Registration Error", "An unexpected error has ocurred upon registering. Register again?");	
+			DialogAdapter.dialogYesNoShowing("Registration Error", "An unexpected error has ocurred upon registering. Register again?", MainActivity.this, fHandler);	
 		}
 		
 		fHandler.setToWrite(toFile);
 		fHandler.writeToFile();
 		
-		registrationSuccess();
+		DialogAdapter.registrationSuccess(MainActivity.this);
 	}
     
 	private void handleLogin(Message msg) {
@@ -151,56 +156,12 @@ public class MainActivity extends Activity {
 		
 		try {
 			received.getString("error");
-			dialogYesNoShowing("Incorrect Login!", "Your login info does not exist in the server. Register again?");			
+			DialogAdapter.dialogYesNoShowing("Incorrect Login!", "Your login info does not exist in the server. Register again?", MainActivity.this, fHandler);			
 		}
 		catch(JSONException jsonExp) {
 	        Intent intent = new Intent(MainActivity.this, CentralActivity.class);
 	        startActivity(intent);
 		}
-	}
-	
-	private void dialogYesNoShowing(String title, String text){
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-		alertDialogBuilder.setTitle(title);
-
-		alertDialogBuilder
-		.setMessage(text)
-		.setCancelable(false)
-		.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog,int id) {
-				fHandler.deleteFile();
-				MainActivity.this.recreate();
-			}
-		})
-		.setNegativeButton("No",new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog,int id) {
-				finish();
-	            System.exit(0);
-			}
-		});
-
-		AlertDialog alertDialog = alertDialogBuilder.create();
-		alertDialog.show();
-	}
-	
-	private void registrationSuccess() {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-		alertDialogBuilder.setTitle("Registration succeeded!");
-
-		alertDialogBuilder
-		.setMessage("Enjoy Bus Ticketer!")
-		.setCancelable(false)
-		.setPositiveButton("OK",new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog,int id) {
-		        Intent intent = new Intent(MainActivity.this, CentralActivity.class);
-		        startActivity(intent);
-			}
-		});
-
-		AlertDialog alertDialog = alertDialogBuilder.create();
-		alertDialog.show();		
 	}
 
     @Override

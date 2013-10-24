@@ -54,7 +54,7 @@
 		    android:paddingBottom="20dp"/>	
 		    	
 		<Button
-		    android:id="@+id/t1_ticket_validate"
+		    android:id="@+id/ticket_validate"
 		    android:layout_width="250dp"
 		    android:layout_height="wrap_content"
 		    android:layout_gravity="center"
@@ -75,9 +75,8 @@
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"
 		    android:gravity="center"
-		    android:text="Timer Holder"
 		    android:textSize="20sp"
-		    android:paddingTop="30dp"/>
+		    android:paddingTop="20dp"/>
         
     </LinearLayout>
 
