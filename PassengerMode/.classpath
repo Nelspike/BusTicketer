@@ -5,5 +5,8 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="C:/Users/Nelspike/Desktop/5.4.4/itextg-5.4.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Nelspike/Desktop/5.4.4/itextg-5.4.4-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Nelspike/Desktop/5.4.4/itextg-5.4.4-sources.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

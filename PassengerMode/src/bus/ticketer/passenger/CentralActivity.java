@@ -1,9 +1,9 @@
 package bus.ticketer.passenger;
 
 import bus.ticketer.adapters.CentralPagerAdapter;
-import bus.ticketer.fragments.*;
+import bus.ticketer.listeners.BusTabListener;
+import bus.ticketer.listeners.SwipeListener;
 import android.app.ActionBar;
-import android.app.ActionBar.Tab;
 import android.os.Bundle;
 import android.support.v4.app.*;
 import android.support.v4.view.ViewPager;
@@ -28,44 +28,14 @@ public class CentralActivity extends FragmentActivity {
 		mViewPager = (ViewPager) findViewById(R.id.CentralPager);
 		mViewPager.setOffscreenPageLimit(0);
 		mViewPager.setAdapter(mCentralActivity);
-
-		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-					@Override
-					public void onPageSelected(int position) {
-						((CentralFragment)((CentralPagerAdapter) mViewPager.getAdapter()).instantiateItem(mViewPager, position)).refresh();
-						getActionBar().setSelectedNavigationItem(position);
-					}
-				});
+		mViewPager.setOnPageChangeListener(new SwipeListener(mViewPager, CentralActivity.this));
 
 		final ActionBar actionBar = getActionBar();
-
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setDisplayShowHomeEnabled(false);
-
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-		ActionBar.TabListener tabListener = new ActionBar.TabListener() {
-
-			@Override
-			public void onTabReselected(Tab arg0,
-					android.app.FragmentTransaction arg1) {
-				// probably ignore, eh?
-
-			}
-
-			@Override
-			public void onTabSelected(Tab arg0,
-					android.app.FragmentTransaction arg1) {
-				mViewPager.setCurrentItem(arg0.getPosition());
-			}
-
-			@Override
-			public void onTabUnselected(Tab arg0,
-					android.app.FragmentTransaction arg1) {
-				// hide the tab
-
-			}
-		};
+		ActionBar.TabListener tabListener = new BusTabListener(mViewPager);
 
 		actionBar.addTab(actionBar.newTab().setText("Validate")
 				.setTabListener(tabListener));

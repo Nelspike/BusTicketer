@@ -20,6 +20,9 @@ public class FileHandler {
 		this.toWrite = toWrite;
 	}
 
+	public FileHandler() {
+	}
+
 	public File getAlbumStorageDir(String filename) {
 		File file = new File(
 				Environment
@@ -92,8 +95,33 @@ public class FileHandler {
 		file.delete();
 	}
 	
+	public static boolean checkFileExistance(String name) {
+		File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS), "BusTicketer");
+		File[] files = file.listFiles();
+		
+		for(File f : files) {
+			if(f.getName().equals(name))
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public void deleteFiles() {
+		File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS), "BusTicketer");
+		File[] files = file.listFiles();
+		
+		for(File f : files)
+			f.delete();
+	}
+	
 	public void setToWrite(String toWrite) {
 		this.toWrite = toWrite;
 	}
 
+	public String getUsername() {
+		filename = "client.txt";
+		return readFromFile().get(0);
+	}
+	
 }

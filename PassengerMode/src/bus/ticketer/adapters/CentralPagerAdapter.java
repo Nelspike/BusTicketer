@@ -3,7 +3,6 @@ package bus.ticketer.adapters;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,7 +10,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
-import bus.ticketer.fragments.CentralFragment;
+import bus.ticketer.fragments.BuyTicketsFragment;
+import bus.ticketer.fragments.ShowTicketsFragment;
 import bus.ticketer.passenger.R;
 
 public class CentralPagerAdapter extends FragmentStatePagerAdapter {
@@ -25,10 +25,11 @@ public class CentralPagerAdapter extends FragmentStatePagerAdapter {
 
 	@Override
 	public Fragment getItem(int i) {
-		Fragment fragment = new CentralFragment();
-		Bundle args = new Bundle();
-		args.putInt(CentralFragment.ARG_OBJECT, i);
-		fragment.setArguments(args);
+		Fragment fragment;
+		
+		if(i == 0) fragment = new ShowTicketsFragment();
+		else fragment = new BuyTicketsFragment();
+		
 		fragments.add(fragment);
 		return fragment;
 	}

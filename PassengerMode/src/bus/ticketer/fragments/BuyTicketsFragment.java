@@ -16,33 +16,39 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.RadioGroup.OnCheckedChangeListener;
 import bus.ticketer.connection.ConnectionThread;
+import bus.ticketer.listeners.TicketPurchaseListener;
+import bus.ticketer.objects.Ticket;
+import bus.ticketer.passenger.BusTicketer;
 import bus.ticketer.passenger.R;
 import bus.ticketer.utils.FileHandler;
 import bus.ticketer.utils.Method;
+import bus.ticketer.utils.PDFWriter;
 import bus.ticketer.utils.RESTFunction;
 
-public class CentralFragment extends Fragment {
+public class BuyTicketsFragment extends Fragment {
 	public static final String ARG_OBJECT = "object";
-	public static final String SPARSE = "sparse";
 	private View rootView;
 	private RESTFunction currentFunction;
-	private ArrayList<Integer> tickets = new ArrayList<Integer>();
+	private SparseArray<ArrayList<Ticket>> tickets;
 	private int t1Bought, t2Bought, t3Bought;
+	
 
 	@SuppressLint("HandlerLeak")
 	private Handler threadConnectionHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (currentFunction) {
+				case BUY_CLIENT_TICKETS:
+					tickets = ((BusTicketer) getActivity().getApplicationContext()).getTickets();
+					break;			
 				case BUY_CLIENT_TICKETS_CLICK:
 					handlePurchase(msg);
 					break;
@@ -55,79 +61,32 @@ public class CentralFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 			ViewGroup container, Bundle savedInstanceState) {
-		
-		Bundle args = getArguments();
-		if (args.getInt(ARG_OBJECT) == 0) {
-			rootView = inflater.inflate(R.layout.fragment_show_tickets,
-					container, false);
-			getTicketInfo(0);
-		} else if (args.getInt(ARG_OBJECT) == 1) {
-			rootView = inflater.inflate(R.layout.fragment_buy_tickets,
+
+		rootView = inflater.inflate(R.layout.fragment_buy_tickets,
 					container, false);
 
-			getTicketInfo(1);
-			buyTicketsHandler();
-		} else {
-			rootView = inflater.inflate(R.layout.fragment_history_tickets,
-					container, false);
-		}
-		
+		getTicketInfo();
+		buyTicketsHandler();
+
 		return rootView;
 	}
 	
 	public void refresh() {
-		Bundle args = getArguments();
-		if (args.getInt(ARG_OBJECT) == 0) {
-			getTicketInfo(0);
-		} else if (args.getInt(ARG_OBJECT) == 1) {
-			getTicketInfo(1);
-			buyTicketsHandler();
-		} else {
-			//To Handle Later
-		}		
+		getTicketInfo();
+		buyTicketsHandler();	
 	}
 	
-	public void getTicketInfo(int i) {
+	public void getTicketInfo() {
 		FileHandler fHandler = new FileHandler("client.txt", "");
 		ArrayList<String> fileContents = fHandler.readFromFile();
 
-		if(i == 0)
-			currentFunction = RESTFunction.GET_CLIENT_TICKETS;
-		else
-			currentFunction = RESTFunction.BUY_CLIENT_TICKETS;
+		currentFunction = RESTFunction.BUY_CLIENT_TICKETS;
+		
 		ConnectionThread dataThread = new ConnectionThread(
 				"http://192.168.0.136:81/list/" + fileContents.get(2),
 				Method.GET, null, threadConnectionHandler, null,
-				currentFunction, rootView);
+				currentFunction, rootView, getActivity());
 		dataThread.start();
-	}
-	
-	public void showTicketsHandler() {
-		RadioGroup radioGroup = (RadioGroup) rootView
-				.findViewById(R.id.ticket_radio);
-		radioGroup.check(R.id.t1_radio);
-		final TextView ticketsText = (TextView) rootView
-				.findViewById(R.id.show_ticket_amount);
-
-		ticketsText.setText(tickets.get(0) + " tickets");
-		radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				switch (checkedId) {
-				case R.id.t1_radio:
-					ticketsText.setText(tickets.get(0) + " tickets");
-					break;
-				case R.id.t2_radio:
-					ticketsText.setText(tickets.get(1) + " tickets");
-					break;
-				case R.id.t3_radio:
-					ticketsText.setText(tickets.get(2) + " tickets");
-					break;
-				default:
-					break;
-				}
-
-			}
-		});
 	}
 
 	public void buyTicketsHandler() {
@@ -148,84 +107,17 @@ public class CentralFragment extends Fragment {
 				.findViewById(R.id.t2_ticket_quantity_buy);
 		final TextView t3Tickets = (TextView) rootView
 				.findViewById(R.id.t3_ticket_quantity_buy);
+		
+		t1Tickets.setText("0");
+		t2Tickets.setText("0");
+		t3Tickets.setText("0");
 
-		t1Minus.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				int current = Integer.parseInt(t1Tickets.getText().toString());
-
-				if (current == 0)
-					return;
-
-				current--;
-				t1Tickets.setText(current + "");
-			}
-
-		});
-
-		t2Minus.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				int current = Integer.parseInt(t2Tickets.getText().toString());
-
-				if (current == 0)
-					return;
-
-				current--;
-				t2Tickets.setText(current + "");
-			}
-
-		});
-
-		t3Minus.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				int current = Integer.parseInt(t3Tickets.getText().toString());
-
-				if (current == 0)
-					return;
-
-				current--;
-				t3Tickets.setText(current + "");
-			}
-
-		});
-
-		t1Plus.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				int current = Integer.parseInt(t1Tickets.getText().toString());
-				current++;
-				t1Tickets.setText(current + "");
-			}
-
-		});
-
-		t2Plus.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				int current = Integer.parseInt(t2Tickets.getText().toString());
-				current++;
-				t2Tickets.setText(current + "");
-			}
-
-		});
-
-		t3Plus.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				int current = Integer.parseInt(t3Tickets.getText().toString());
-				current++;
-				t3Tickets.setText(current + "");
-			}
-
-		});
+		t1Minus.setOnClickListener(new TicketPurchaseListener("Minus", t1Tickets));
+		t2Minus.setOnClickListener(new TicketPurchaseListener("Minus", t2Tickets));
+		t3Minus.setOnClickListener(new TicketPurchaseListener("Minus", t3Tickets));
+		t1Plus.setOnClickListener(new TicketPurchaseListener("Plus", t1Tickets));
+		t2Plus.setOnClickListener(new TicketPurchaseListener("Plus", t2Tickets));
+		t3Plus.setOnClickListener(new TicketPurchaseListener("Plus", t3Tickets));
 
 		buyTickets.setOnClickListener(new OnClickListener() {
 
@@ -250,6 +142,7 @@ public class CentralFragment extends Fragment {
 
 					@Override
 					public void onDismiss(DialogInterface dialog) {
+						purchaseProcess();
 						purchaseSuccess();
 					}
 				});
@@ -258,11 +151,30 @@ public class CentralFragment extends Fragment {
 				ConnectionThread dataThread = new ConnectionThread(
 						"http://192.168.0.136:81/buy/", Method.POST,
 						params, threadConnectionHandler, progDialog,
-						currentFunction, rootView);
+						currentFunction, rootView, getActivity());
 				dataThread.start();
 			}
 
 		});
+		
+		if(((BusTicketer) getActivity().getApplication()).isTimerOn()) {
+			t1Minus.setEnabled(false);
+			t2Minus.setEnabled(false);
+			t3Minus.setEnabled(false);
+			t1Plus.setEnabled(false);
+			t2Plus.setEnabled(false);
+			t3Plus.setEnabled(false);
+			buyTickets.setEnabled(false);
+		}
+		else {
+			t1Minus.setEnabled(true);
+			t2Minus.setEnabled(true);
+			t3Minus.setEnabled(true);
+			t1Plus.setEnabled(true);
+			t2Plus.setEnabled(true);
+			t3Plus.setEnabled(true);
+			buyTickets.setEnabled(true);			
+		}
 	}
 	
 	private void purchaseSuccess() {
@@ -294,5 +206,22 @@ public class CentralFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+	}
+	
+	private void purchaseProcess() {
+		FileHandler fHandler = new FileHandler("client.txt", "");
+		ArrayList<String> fileContents = fHandler.readFromFile();
+		int currentT1 = tickets.get(1).size();
+		int currentT2 = tickets.get(2).size();
+		int currentT3 = tickets.get(3).size();
+
+		for(int i = currentT1; i < t1Bought; i++)
+			new PDFWriter("t1-ticket"+i+".pdf", "T1", fileContents.get(0), null, false).createFile();
+		
+		for(int i = currentT2; i < t2Bought; i++)
+			new PDFWriter("t2-ticket"+i+".pdf", "T2", fileContents.get(0), null, false).createFile();
+		
+		for(int i = currentT3; i < t3Bought; i++)
+			new PDFWriter("t3-ticket"+i+".pdf", "T3", fileContents.get(0), null, false).createFile();
 	}
 }

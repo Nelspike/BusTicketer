@@ -62,7 +62,7 @@
                 android:textSize="20sp" />
 
             <Button
-                android:id="@+id/t1_ticket_validate"
+                android:id="@+id/ticket_validate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -92,7 +92,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:paddingTop="30dp"
+                android:paddingTop="20dp"
                 android:text="Timer Holder"
                 android:textSize="20sp" />
         </LinearLayout>
