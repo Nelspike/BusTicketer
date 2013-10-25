@@ -17,7 +17,7 @@ public class BusTicketer extends Application {
     private boolean timerOn = false;
     private SparseArray<ArrayList<Ticket>> tickets = new SparseArray<ArrayList<Ticket>>();
     private String clientFilename = "client";
-
+    private String IPAddress = "http://10.13.37.73:81/";
     public boolean isTimerOn() {
         return timerOn;
     }
@@ -65,5 +65,13 @@ public class BusTicketer extends Application {
 
 	public void setClientFilename(String clientFilename) {
 		this.clientFilename = clientFilename;
+	}
+
+	public String getIPAddress() {
+		return IPAddress;
+	}
+
+	public void setIPAddress(String iPAddress) {
+		IPAddress = iPAddress;
 	}
 }

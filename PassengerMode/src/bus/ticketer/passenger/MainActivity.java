@@ -29,6 +29,7 @@ public class MainActivity extends Activity {
 
 	private String password = "";
 	private String toFile = "";
+	private String IPAddress = "";
 	private FileHandler fHandler;
 	private RESTFunction currentFunction;
 	ProgressDialog progDialog;
@@ -64,6 +65,8 @@ public class MainActivity extends Activity {
 					MainActivity.this, "",
 					"Loading, please wait!", true);
 	        
+			IPAddress = ((BusTicketer) MainActivity.this.getApplication()).getIPAddress();
+			
 	        handleInitialization();
 	        setContentView(R.layout.activity_main);
 	        
@@ -113,7 +116,7 @@ public class MainActivity extends Activity {
 		params.add(new BasicNameValuePair("validity", validity));
 
 		currentFunction = RESTFunction.CREATE_CLIENT;
-		ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/create/", Method.POST,params, threadConnectionHandler, progDialog, currentFunction, null, this);
+		ConnectionThread dataThread = new ConnectionThread(IPAddress+"client/create/", Method.POST,params, threadConnectionHandler, progDialog, currentFunction, null, this);
 		dataThread.start();
     }
     
@@ -127,7 +130,7 @@ public class MainActivity extends Activity {
     		params.add(new BasicNameValuePair("pass", fileContents.get(1)));
     		
     		currentFunction = RESTFunction.LOGIN_CLIENT;
-        	ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/login/", Method.POST, params, threadConnectionHandler, progDialog, currentFunction, null, this);
+        	ConnectionThread dataThread = new ConnectionThread(IPAddress+"client/login/", Method.POST, params, threadConnectionHandler, progDialog, currentFunction, null, this);
     		dataThread.start();
         }
         else

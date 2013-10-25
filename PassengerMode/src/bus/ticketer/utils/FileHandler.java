@@ -120,7 +120,7 @@ public class FileHandler {
 	}
 
 	public String getUsername() {
-		filename = "client.txt";
+		filename = "client";
 		return readFromFile().get(0);
 	}
 	

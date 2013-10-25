@@ -5,10 +5,14 @@ import java.util.Date;
 public class Ticket {
 	private Date creationDate;
 	private Date validationDate;
-	private int busID;
+	private int busID, ticketID;
 	
 	public Ticket() {
 		
+	}
+	
+	public Ticket(int id) {
+		this.setTicketID(id);
 	}
 	
 	public Ticket(Date creationDate) {
@@ -37,6 +41,14 @@ public class Ticket {
 
 	public void setBusID(int busID) {
 		this.busID = busID;
+	}
+
+	public int getTicketID() {
+		return ticketID;
+	}
+
+	public void setTicketID(int ticketID) {
+		this.ticketID = ticketID;
 	}
 	
 	
