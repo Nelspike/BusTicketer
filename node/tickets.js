@@ -93,25 +93,50 @@ sqliteDB.prototype.validate=function(type,client,bus,callback)
 	console.log("validate ticket ",type," client ",client);
 	if ( typeof callback !== 'function')
 		throw new Error('Callback is not a function');
-	ticketConn.get("SELECT tid FROM tickets WHERE type=? AND cid=? AND busID IS NULL",[type,client],
-		function (err,row) {
-			if (row)
-			{
-				//console.log(JSON.stringify(row));
-				
-				var date=timestamp();
-				var ticket=row.tid;
-				ticketConn.run("UPDATE tickets SET dateValidated=?,busID=? WHERE tid=?",[date,bus,ticket],
-					function(err)
-					{
-						if (!err)console.log("validate db changes ",this.changes);
-						else console.log("validate db error");
-						callback(err,this.changes);
-					});
-			}
-			else
-				callback(err,null);
-		});
+	var dateV;
+	if (type==1)dateV=moment().subtract('minutes',15).format("YYYY-MM-DDTHH:mm:ss");
+	if (type==2)dateV=moment().subtract('minutes',30).format("YYYY-MM-DDTHH:mm:ss");
+	if (type==3)dateV=moment().subtract('minutes',45).format("YYYY-MM-DDTHH:mm:ss");
+	ticketConn.get("SELECT tid FROM tickets WHERE type=? AND cid=? AND dateValidated>?",[type,client,dateV],
+	function (err,row)
+	{
+		if (row)
+		{
+			
+			var ticket=row.tid;
+			ticketConn.run("UPDATE tickets SET busID=? WHERE tid=?",[bus,ticket],
+				function(err)
+				{
+					if (!err)console.log("REvalidate db changes ",this.changes);
+					else console.log("REvalidate db error");
+					callback(err,ticket);
+				});
+		}
+		else
+		{	
+			ticketConn.get("SELECT tid FROM tickets WHERE type=? AND cid=? AND busID IS NULL",[type,client],
+			function (err,row) {
+				if (row)
+				{
+					//console.log(JSON.stringify(row));
+					var date=timestamp();
+					var ticket=row.tid;
+					ticketConn.run("UPDATE tickets SET dateValidated=?,busID=? WHERE tid=?",[date,bus,ticket],
+						function(err)
+						{
+							if (!err)console.log("validate db changes ",this.changes);
+							else console.log("validate db error");
+							callback(err,ticket);
+						});
+				}
+				else
+					callback(err,null);
+			});
+			
+		}
+	
+	});
+	
 	
 }
 
@@ -121,8 +146,8 @@ sqliteDB.prototype.listTickets=function(clientID,callback)
 	if ( typeof callback !== 'function')
 		throw new Error('Callback is not a function');
 		
-	var out={};out.t1=0;out.t2=0;out.t3=0;
-	ticketConn.each("SELECT type FROM tickets WHERE cid=? AND busID is NULL",[clientID],
+	var out={};out.t1=[];out.t2=[];out.t3=[];
+	ticketConn.each("SELECT type, tid FROM tickets WHERE cid=? AND busID is NULL",[clientID],
 		function (err,row) { //eachfunction
 			if (err)
 			{
@@ -130,9 +155,9 @@ sqliteDB.prototype.listTickets=function(clientID,callback)
 			}
 			else
 			{
-				if (row.type==1) out.t1++;
-				if (row.type==2) out.t2++;
-				if (row.type==3) out.t3++;
+				if (row.type==1) out.t1.push(row.tid);
+				if (row.type==2) out.t2.push(row.tid);
+				if (row.type==3) out.t3.push(row.tid);
 			}
 		},
 		function(err,nrows)
@@ -199,6 +224,7 @@ sqliteDB.prototype.buyTickets=function(clientID,t1,t2,t3,callback)
 	if ( typeof callback !== 'function')
 		throw new Error('Callback is not a function');	
 	var count,resto;
+	
 	resto=t3%10;
 	count=t3-resto;
 	t3+=count/10;
@@ -212,7 +238,7 @@ sqliteDB.prototype.buyTickets=function(clientID,t1,t2,t3,callback)
 	t1+=count/10;
 	var ts=timestamp();
 	
-	var out={};out.t1=0;out.t2=0;out.t3=0;
+	var out={};out.t1=[];out.t2=[];out.t3=[];
 	console.log("tickets + bonus: ",t1," ",t2," ",t3);
 	ticketConn.serialize(function(){
 		ticketConn.parallelize(function(){
@@ -231,7 +257,7 @@ sqliteDB.prototype.buyTickets=function(clientID,t1,t2,t3,callback)
 
 			}
 		});
-		ticketConn.each("SELECT type FROM tickets WHERE cid=?",[clientID],
+		ticketConn.each("SELECT type,tid FROM tickets WHERE cid=? and dateBought=?",[clientID,ts],
 			function (err,row) { //eachfunction
 				if (err)
 				{
@@ -239,9 +265,9 @@ sqliteDB.prototype.buyTickets=function(clientID,t1,t2,t3,callback)
 				}
 				else
 				{
-					if (row.type==1) out.t1++;
-					if (row.type==2) out.t2++;
-					if (row.type==3) out.t3++;
+					if (row.type==1) out.t1.push(row.tid);
+					if (row.type==2) out.t2.push(row.tid);
+					if (row.type==3) out.t3.push(row.tid);
 				}
 			},
 			function(err,nrows)

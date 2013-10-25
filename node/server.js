@@ -162,7 +162,7 @@ app.post('/validate',function(req,res){
 
 			if( err ) {
 				code = 500;
-				out.error = 'Impossible to add client';
+				out.error = 'Impossible to validate';
 				out.status=false;
 				console.log('Error validating ticket: ' + err);
 			}
@@ -178,7 +178,7 @@ app.post('/validate',function(req,res){
 				{
 				
 					out.status=true;
-					console.log('validate ticket: ',type,' ',cid,' ',bid);
+					console.log('validate ticket: ',row,' ',type,' ',cid,' ',bid);
 				}
 			}
 
@@ -190,7 +190,7 @@ app.post('/validate',function(req,res){
  
  // Retorna bilhetes de um cliente
  // GET /list/:clientID PARAMS clientID: numeric client ID
- //returns {t1:21,t2:32,t3:43}
+ //returns {t1:[Array of ID],t2:[Array of ID],t3:[Array of ID]}
 app.get('/list/:client', function (req, res) {
 
 	var cid = req.params.client;
@@ -235,26 +235,60 @@ app.get('/list/:client', function (req, res) {
 
 
 // Comprar bilhetes
-// POST /buy PARAMS: cid:client id, t1:nr de t1s, t2:nr de t2s,t3:nr de t3s
-// returns {t1:21,t2:32,t3:43}
+// POST /buy PARAMS: cid:client id, t1:nr de t1s, t2:nr de t2s,t3:nr de t3s. OPTIONAL: token: token
+// returns {t1:21 or [ID array] ,t2:32 or [ID array],t3:[ID array],(token:asd,cost:int)}
 app.post('/buy', function (req, res) {
 
 	var cid = req.body.cid,t1=new Number(req.body.t1),t2=new Number(req.body.t2),t3=new Number(req.body.t3);
-	
+	var token=req.body.token;
 	// Verifica se todos os valores enviados sÃ£o inteiros e maiores que zero
 	// NÃ£o verifica se os cÃ³digos enviados existem na base de dados
 	if( !cid ||!t1||!t2||!t3)
 		respondToJSON( req, res, {error: 'Bad request'}, 400 );
+	else if(t1>10||t2>10||t3>10) respondToJSON( req, res, {error: 'Bad request, too many tickets'}, 400 );
+	else if (!token)
+	{
+		var code;
+		var out={};
+		code = 200;
+		out.t1=0;out.t2=0;out.t3=0;
+		out.cost=t3*3+t2*2+t1*1;
+		resto=t3%10;
+		count=t3-resto;
+		out.t3+=count/10;
+		count=resto+t2;
+		resto=count%10;
+		count=count-resto;
+		out.t2+=count/10;
+		count=resto+t1;
+		resto=count%10;
+		count=count-resto;
+		out.t1+=count/10;
+		out.token='asdlol'+cid;
+		console.log('client ask for tickets price: ',cid, ' ',JSON.stringify( out ));
+				
+		
 
+		respondToJSON( req, res, out, code );
+	
+	}
+	else if (token!='asdlol'+cid)
+	{
+		var code = 500;
+		var out={};
+		out.error = 'wrong token';
+		console.log('Error buying tickets, wrong token ',token);
+		respondToJSON( req, res, out, code );
+	}
 	else {
-
+		
 		db.buyTickets(cid,t1,t2,t3, function(err,out) {
 			var code;
 
 			if( err ) {
 				code = 500;
 				out.error = 'Impossible to buys tickets for client';
-				console.log('Error listing tickets: ' + err);
+				console.log('Error buying tickets: ' + err);
 			}
 			else {
 				code = 200;
@@ -266,6 +300,7 @@ app.post('/buy', function (req, res) {
 				else
 				{
 					console.log('client tickets after buy: ',cid, ' ',JSON.stringify( out ));
+					
 				}
 			}
 

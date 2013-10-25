@@ -5,7 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="texthint_inseririd">Insert id</string>
-    <string name="request_info">Scan BUS info</string>
+    <string name="request_info">Ler informação BUS</string>
     <string name="title_activity_scan">ScanActivity</string>
     <string name="Waiting">Espera de contato</string>
     <string name="Scanning">A ler dados</string>
