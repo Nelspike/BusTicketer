@@ -5,8 +5,13 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="16"
         android:targetSdkVersion="18" />
+   	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+	<uses-permission android:name="android.permission.NFC"></uses-permission>
+    <data android:mimeType="BusTicketer" />
+    
+    <uses-feature android:name="android.hardware.nfc" android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -26,6 +31,7 @@
             android:name="bus.ticketer.inspector.ScanActivity"
             android:label="@string/title_activity_scan" >
         </activity>
+        
     </application>
 
 </manifest>
