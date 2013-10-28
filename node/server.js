@@ -266,8 +266,6 @@ app.post('/buy', function (req, res) {
 		out.t1+=count/10;
 		out.token='asdlol'+cid;
 		console.log('client ask for tickets price: ',cid, ' ',JSON.stringify( out ));
-				
-		
 
 		respondToJSON( req, res, out, code );
 	

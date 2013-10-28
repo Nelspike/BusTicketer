@@ -86,13 +86,21 @@ public class BuyTicketsFragment extends Fragment {
 		FileHandler fHandler = new FileHandler(((BusTicketer) getActivity().getApplication()).getClientFilename(), "");
 		ArrayList<String> fileContents = fHandler.readFromFile();
 
-		currentFunction = RESTFunction.BUY_CLIENT_TICKETS;
 		
-		ConnectionThread dataThread = new ConnectionThread(
-				IPAddress+"list/" + fileContents.get(2),
-				Method.GET, null, threadConnectionHandler, null,
-				currentFunction, rootView, getActivity());
-		dataThread.start();
+		if(!((BusTicketer) getActivity().getApplication()).isNetworkAvailable()) {
+			SparseArray<ArrayList<Ticket>> tickets = FileHandler.getTicketCount();
+			((BusTicketer) getActivity().getApplicationContext()).setTickets(tickets);
+			quantityHandler();			
+		}
+		else {
+			currentFunction = RESTFunction.BUY_CLIENT_TICKETS;
+			
+			ConnectionThread dataThread = new ConnectionThread(
+					IPAddress+"list/" + fileContents.get(2),
+					Method.GET, null, threadConnectionHandler, null,
+					currentFunction, rootView, getActivity());
+			dataThread.start();
+		}
 	}
 
 	public void buyTicketsHandler() {
@@ -194,6 +202,16 @@ public class BuyTicketsFragment extends Fragment {
 			t3Plus.setEnabled(true);
 			buyTickets.setEnabled(true);			
 		}
+		
+		if(!((BusTicketer) getActivity().getApplication()).isNetworkAvailable()) {
+			t1Minus.setEnabled(false);
+			t2Minus.setEnabled(false);
+			t3Minus.setEnabled(false);
+			t1Plus.setEnabled(false);
+			t2Plus.setEnabled(false);
+			t3Plus.setEnabled(false);
+			buyTickets.setEnabled(false);			
+		}
 	}
 	
 	private void purchaseSuccess() {
@@ -202,7 +220,7 @@ public class BuyTicketsFragment extends Fragment {
 		alertDialogBuilder.setTitle("Purchase succeeded!");
 
 		alertDialogBuilder
-		.setMessage("You now have: " + t1Bought + " T1 Tickets, " + t2Bought + " T2 Tickets and " + t3Bought + " T3 Tickets")
+		.setMessage("You have bought: " + t1Bought + " T1 Tickets, " + t2Bought + " T2 Tickets and " + t3Bought + " T3 Tickets, for " + transactionCost + "€.")
 		.setCancelable(false)
 		.setPositiveButton("OK",new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog,int id) {
@@ -261,17 +279,20 @@ public class BuyTicketsFragment extends Fragment {
 				ret += t2Bought + "t2 tickets";
 				if(t3Bought != 0) ret += " and " + t3Bought + "t3 tickets";
 			}
-			else
+			else {
 				if(t3Bought != 0) ret += t3Bought + "t3 tickets";
+				ret = "(no tickets)";
+			}
 		}
 		
-		return "You will get a bonus of: " + ret + ", and it will cost you " + transactionCost + " €.";
+		return "You will get a bonus of: " + ret + " and it will cost you " + transactionCost + " €.";
 	}
 	
 	private void handleBuyPayload(Message msg) {
         JSONObject ticketListing = (JSONObject) msg.obj;
         try {
         	JSONArray t1Array = ticketListing.getJSONArray("t1");
+        	
         	for(int i = 0; i < t1Array.length(); i++)
         		tickets.get(1).add(new Ticket(t1Array.getInt(i)));
         	
@@ -282,6 +303,10 @@ public class BuyTicketsFragment extends Fragment {
         	JSONArray t3Array = ticketListing.getJSONArray("t3");
         	for(int i = 0; i < t3Array.length(); i++)
         		tickets.get(3).add(new Ticket(t3Array.getInt(i)));
+        	        	
+        	t1Bought = t1Array.length();
+        	t2Bought = t2Array.length();
+        	t3Bought = t3Array.length();
         	
         } catch (JSONException e) {
             e.printStackTrace();
@@ -313,17 +338,32 @@ public class BuyTicketsFragment extends Fragment {
 		
 		for(Ticket t : t1Tickets) {
 			if(!FileHandler.checkFileExistance(t.getTicketID()+".pdf"))
-				new PDFWriter(t.getTicketID()+".pdf", "T1", fileContents.get(0), null, false).createFile();
+				new PDFWriter("t1Ticket-"+t.getTicketID()+".pdf", "T1", fileContents.get(0), null, false).createFile();
 		}
 
 		for(Ticket t : t2Tickets) {
 			if(!FileHandler.checkFileExistance(t.getTicketID()+".pdf"))
-				new PDFWriter(t.getTicketID()+".pdf", "T1", fileContents.get(0), null, false).createFile();
+				new PDFWriter("t2Ticket-"+t.getTicketID()+".pdf", "T1", fileContents.get(0), null, false).createFile();
 		}
 		
 		for(Ticket t : t3Tickets) {
 			if(!FileHandler.checkFileExistance(t.getTicketID()+".pdf"))
-				new PDFWriter(t.getTicketID()+".pdf", "T1", fileContents.get(0), null, false).createFile();
+				new PDFWriter("t3Ticket-"+t.getTicketID()+".pdf", "T1", fileContents.get(0), null, false).createFile();
 		}
 	}
+	
+	private void quantityHandler() {
+		TextView t1TicketsQuantity = (TextView) rootView
+				.findViewById(R.id.t1_ticket_quantity);
+		TextView t2TicketsQuantity = (TextView) rootView
+				.findViewById(R.id.t2_ticket_quantity);
+		TextView t3TicketsQuantity = (TextView) rootView
+				.findViewById(R.id.t3_ticket_quantity);
+
+		SparseArray<ArrayList<Ticket>> tickets = ((BusTicketer) getActivity().getApplicationContext()).getTickets();
+		
+		t1TicketsQuantity.setText(tickets.get(1).size() + "");
+		t2TicketsQuantity.setText(tickets.get(2).size() + "");
+		t3TicketsQuantity.setText(tickets.get(3).size() + "");
+	}	
 }

@@ -43,7 +43,6 @@ public class CentralActivity extends FragmentActivity {
 				.setTabListener(tabListener));
 		/*actionBar.addTab(actionBar.newTab().setText("History")
 				.setTabListener(tabListener));*/
-		
 	}
 	
 }

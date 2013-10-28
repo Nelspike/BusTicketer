@@ -49,7 +49,10 @@ public class ConnectionThread extends Thread {
 	public void run() {				
 		runConnection.run();
 		threadMsg();
-		fillList();
+		
+		if(!currentFunction.toString().equals(RESTFunction.BUY_CLIENT_TICKETS_CLICK.toString()) && !currentFunction.toString().equals(RESTFunction.BUY_CONFIRMATION_CLIENT.toString()))
+				fillList();
+		
 		handleView();
 
 		if (progDialog != null)
@@ -81,7 +84,7 @@ public class ConnectionThread extends Thread {
             ArrayList<Ticket> t1TicketsCurrent = tickets.get(1);
             ArrayList<Ticket> t2TicketsCurrent = tickets.get(2);
             ArrayList<Ticket> t3TicketsCurrent = tickets.get(3);
-        	
+            
         	JSONArray t1Tickets = ticketListing.getJSONArray("t1");
         	JSONArray t2Tickets = ticketListing.getJSONArray("t2");
         	JSONArray t3Tickets = ticketListing.getJSONArray("t3");

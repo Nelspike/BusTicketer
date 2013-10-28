@@ -8,7 +8,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import bus.ticketer.objects.Ticket;
+
 import android.os.Environment;
+import android.util.SparseArray;
 
 public class FileHandler {
 
@@ -105,6 +108,30 @@ public class FileHandler {
 		}
 		
 		return false;
+	}
+	
+	public static SparseArray<ArrayList<Ticket>> getTicketCount() {
+		File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS), "BusTicketer");
+		File[] files = file.listFiles();
+		SparseArray<ArrayList<Ticket>> ret = new SparseArray<ArrayList<Ticket>>();
+		ArrayList<Ticket> t1Tickets = new ArrayList<Ticket>();
+		ArrayList<Ticket> t2Tickets = new ArrayList<Ticket>();
+		ArrayList<Ticket> t3Tickets = new ArrayList<Ticket>();
+		
+		for(File f : files) {
+			if(f.getName().contains("t1Ticket"))
+				t1Tickets.add(new Ticket(Integer.parseInt(f.getName().split("-")[1].split("\\.")[0])));
+			else if(f.getName().contains("t2Ticket"))
+				t2Tickets.add(new Ticket(Integer.parseInt(f.getName().split("-")[1].split("\\.")[0])));
+			else if(f.getName().contains("t3Ticket"))
+				t3Tickets.add(new Ticket(Integer.parseInt(f.getName().split("-")[1].split("\\.")[0])));
+		}
+		
+		ret.append(1, t1Tickets);
+		ret.append(2, t2Tickets);
+		ret.append(3, t3Tickets);
+		
+		return ret;
 	}
 	
 	public void deleteFiles() {

@@ -17,7 +17,7 @@ public class BusTicketer extends Application {
     private boolean timerOn = false;
     private SparseArray<ArrayList<Ticket>> tickets = new SparseArray<ArrayList<Ticket>>();
     private String clientFilename = "client";
-    private String IPAddress = "http://10.13.37.73:81/";
+    private String IPAddress = "http://192.168.0.136:81/";
     public boolean isTimerOn() {
         return timerOn;
     }
