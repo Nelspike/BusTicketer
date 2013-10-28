@@ -165,6 +165,23 @@ public class ConnectionThread extends Thread {
 		final TextView timerText = (TextView) view.findViewById(R.id.ticket_timer);
 		final SparseArray<ArrayList<Ticket>> tickets = ((BusTicketer) context.getApplicationContext()).getTickets();
 		final Button validationButton = (Button) view.findViewById(R.id.ticket_validate);
+
+		/*ImageView qr = (ImageView) view.findViewById(R.id.qr_code_holder);
+		
+		Ticket one = ((BusTicketer) context.getApplicationContext()).getTickets().get(1).get(0);
+		
+		QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(one.getTicketID()+"", null, Contents.Type.TEXT, BarcodeFormat.QR_CODE.toString(), 450);
+		Bitmap bitmap = null;
+		try {
+			bitmap = qrCodeEncoder.encodeAsBitmap();
+		} catch (WriterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		one.setQRCode(bitmap);
+		
+		qr.setImageBitmap(bitmap);*/
 		
 		radioGroup.check(R.id.t1_radio);
 		radioGroup.setOnCheckedChangeListener(new RadioGroupListener(context.getApplicationContext(),ticketsText));

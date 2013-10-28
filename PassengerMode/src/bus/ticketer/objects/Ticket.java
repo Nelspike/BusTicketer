@@ -2,10 +2,13 @@ package bus.ticketer.objects;
 
 import java.util.Date;
 
+import android.graphics.Bitmap;
+
 public class Ticket {
 	private Date creationDate;
 	private Date validationDate;
 	private int busID, ticketID;
+	private Bitmap QRCode;
 	
 	public Ticket() {
 		
@@ -49,6 +52,14 @@ public class Ticket {
 
 	public void setTicketID(int ticketID) {
 		this.ticketID = ticketID;
+	}
+
+	public Bitmap getQRCode() {
+		return QRCode;
+	}
+
+	public void setQRCode(Bitmap qRCode) {
+		QRCode = qRCode;
 	}
 	
 	

@@ -43,6 +43,7 @@ public class ShowTicketsFragment extends Fragment {
 		rootView = inflater.inflate(R.layout.fragment_show_tickets, container, false);
 		IPAddress = ((BusTicketer) getActivity().getApplication()).getIPAddress();
 		getTicketInfo();
+		
 		return rootView;
 	}
 	
