@@ -148,15 +148,15 @@ app.post('/client/login',function (req,res) {
 });
 
 //validar um bilhete
-//POST /validate PARAMS: cid:client id, type:ticket type, bid:bus id
+//POST /validate PARAMS: tid:ticket id, bid:bus id
 //Return JSON {status:true/false}
 app.post('/validate',function(req,res){
-	if( !req.body.type ||!req.body.cid||!req.body.bid)
+	if( !req.body.tid||!req.body.bid)
 		respondToJSON( req, res, {error: 'Bad request'}, 400 );
 	else
 	{
-		var cid=req.body.cid,type=req.body.type,bid=req.body.bid;
-		db.validate(type,cid,bid, function(err,row) {
+		var tid=req.body.tid,bid=req.body.bid;
+		db.validate(tid,bid, function(err,row) {
 			var out = {},
 				code;
 
@@ -172,13 +172,13 @@ app.post('/validate',function(req,res){
 				{
 					out.error = 'Wrong TICKET/USER';
 					out.status=false;
-					console.log('Fail validate: ',type,' ',cid,' ',bid);
+					console.log('Fail validate: ',tid,' ',bid);
 				}
 				else
 				{
 				
 					out.status=true;
-					console.log('validate ticket: ',row,' ',type,' ',cid,' ',bid);
+					console.log('validate ticket: ',row,' ',tid,' ',bid);
 				}
 			}
 

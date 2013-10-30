@@ -1,6 +1,11 @@
 package bus.ticketer.inspector;
 
+import bus.ticketer.connection.ConnectionThread;
+import bus.ticketer.utils.Method;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.View;
@@ -55,7 +60,9 @@ public class MainActivity extends Activity implements CreateNdefMessageCallback,
 	@Override
 	public NdefMessage createNdefMessage(NfcEvent event)
 	{
-		NdefMessage msg = new NdefMessage(new NdefRecord[]{NdefRecord.createMime("BusTicketer", "getInfo".getBytes())});
+		NdefMessage msg = new NdefMessage(new NdefRecord[]{
+				NdefRecord.createMime("BusTicketer", "getInfo".getBytes())}
+		);
 		return msg;
 	}
 
@@ -63,7 +70,19 @@ public class MainActivity extends Activity implements CreateNdefMessageCallback,
 	@Override
 	public void onNdefPushComplete(NfcEvent arg0) {
 		//fazer pedido HTTP ao server 
-		
+		String busId="";
+    	ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/getValidated/"+busId, Method.GET, null, threadConnectionHandler);
+		dataThread.start();
 	}
+	
+	@SuppressLint("HandlerLeak")
+	private Handler threadConnectionHandler = new Handler(){
+		@Override
+		public void handleMessage(Message msg)
+		{
+			//mudar o intent e gravar os dados
+			
+		}
+	};
     
 }

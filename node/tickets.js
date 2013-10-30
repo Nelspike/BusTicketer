@@ -88,50 +88,55 @@ sqliteDB.prototype.login=function(name,pass,callback)
 	});
 }
 
-sqliteDB.prototype.validate=function(type,client,bus,callback)
+sqliteDB.prototype.validate=function(ticket,bus,callback)
 {
-	console.log("validate ticket ",type," client ",client);
+	console.log("validate ticket ",ticket," bus ",bus);
 	if ( typeof callback !== 'function')
 		throw new Error('Callback is not a function');
 	var dateV;
-	if (type==1)dateV=moment().subtract('minutes',15).format("YYYY-MM-DDTHH:mm:ss");
-	if (type==2)dateV=moment().subtract('minutes',30).format("YYYY-MM-DDTHH:mm:ss");
-	if (type==3)dateV=moment().subtract('minutes',45).format("YYYY-MM-DDTHH:mm:ss");
-	ticketConn.get("SELECT tid FROM tickets WHERE type=? AND cid=? AND dateValidated>?",[type,client,dateV],
+	
+	ticketConn.get("SELECT tid,type,dateValidated FROM tickets WHERE tid=?",[ticket],
 	function (err,row)
 	{
 		if (row)
 		{
-			
+			var type=row.type;
 			var ticket=row.tid;
-			ticketConn.run("UPDATE tickets SET busID=? WHERE tid=?",[bus,ticket],
-				function(err)
-				{
-					if (!err)console.log("REvalidate db changes ",this.changes);
-					else console.log("REvalidate db error");
-					callback(err,ticket);
-				});
+			if (type==1)dateV=moment().subtract('minutes',15).format("YYYY-MM-DDTHH:mm:ss");
+			if (type==2)dateV=moment().subtract('minutes',30).format("YYYY-MM-DDTHH:mm:ss");
+			if (type==3)dateV=moment().subtract('minutes',45).format("YYYY-MM-DDTHH:mm:ss");
+			if (!row.dateValidated)
+			{
+				var date=timestamp();
+				ticketConn.run("UPDATE tickets SET dateValidated=?,busID=? WHERE tid=?",[date,bus,ticket],
+					function(err)
+					{
+						if (!err)console.log("validate db changes ",this.changes);
+						else console.log("validate db error");
+						callback(err,ticket);
+					});
+			}
+			else if (row.dateValidated>dateV)
+			{
+				
+				ticketConn.run("UPDATE tickets SET busID=? WHERE tid=?",[bus,ticket],
+					function(err)
+					{
+						if (!err)console.log("REvalidate db changes ",this.changes);
+						else console.log("REvalidate db error");
+						callback(err,ticket);
+					});
+			}
+			else
+			{	
+				console.log("validate error: ticket already used");
+				callback(err,null);
+			}
 		}
 		else
 		{	
-			ticketConn.get("SELECT tid FROM tickets WHERE type=? AND cid=? AND busID IS NULL",[type,client],
-			function (err,row) {
-				if (row)
-				{
-					//console.log(JSON.stringify(row));
-					var date=timestamp();
-					var ticket=row.tid;
-					ticketConn.run("UPDATE tickets SET dateValidated=?,busID=? WHERE tid=?",[date,bus,ticket],
-						function(err)
-						{
-							if (!err)console.log("validate db changes ",this.changes);
-							else console.log("validate db error");
-							callback(err,ticket);
-						});
-				}
-				else
-					callback(err,null);
-			});
+			console.log("validate error: ticket not found");
+			callback(err,null);
 			
 		}
 	
