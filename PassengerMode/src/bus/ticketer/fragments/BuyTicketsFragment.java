@@ -179,6 +179,7 @@ public class BuyTicketsFragment extends Fragment {
 						IPAddress+"buy/", Method.POST,
 						params, threadConnectionHandler, progDialog,
 						currentFunction, rootView, getActivity());
+				
 				dataThread.start();
 			}
 
