@@ -3,11 +3,14 @@ package bus.ticketer.listeners;
 import java.util.ArrayList;
 
 import bus.ticketer.objects.Ticket;
+import bus.ticketer.passenger.BeamActivity;
 import bus.ticketer.passenger.BusTicketer;
 import bus.ticketer.passenger.R;
 import bus.ticketer.utils.FileHandler;
 import bus.ticketer.utils.PDFWriter;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.CountDownTimer;
 import android.util.SparseArray;
 import android.view.View;
@@ -15,6 +18,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ValidationListener implements OnClickListener {
 
@@ -30,16 +34,14 @@ public class ValidationListener implements OnClickListener {
 		this.radio = radio;
 	}
 	
+	@SuppressLint("ShowToast")
 	@Override
 	public void onClick(View v) {
-		final Button btn = (Button) v;
-		btn.setEnabled(false);
-		for (int i = 0; i < radio.getChildCount(); i++)
-			radio.getChildAt(i).setEnabled(false);
 		
+		final Button btn = (Button) v;
 		String type = "";
 		String filename = "";
-		int pos = 0;
+		int pos = -1;
 		long timeInMinutes = 0;
 		
 		switch(radio.getCheckedRadioButtonId()) {
@@ -58,35 +60,56 @@ public class ValidationListener implements OnClickListener {
 			default:
 				break;
 		}
-		
-		int sizeToCheck = 0;
-		
+				
 		if(type.equals("T1")) {
-			sizeToCheck = tickets.get(1).size();
-			filename = "t1-ticket";
+			ArrayList<Ticket> t1Tickets = tickets.get(1);
+			filename = "t1Ticket-";
+			
+			for(Ticket t : t1Tickets) {
+				int id = t.getTicketID();
+				if(FileHandler.checkFileExistance(filename+id+".pdf")) {
+					FileHandler fh = new FileHandler(filename+id+".pdf", "");
+					fh.deleteFile();
+					new PDFWriter(filename+id+".pdf", type, new FileHandler().getUsername(), null, true).createFile();
+					pos = id;
+					break;
+				}
+			}
 		}
 		else if(type.equals("T2")) {
-			sizeToCheck = tickets.get(2).size();
-			filename = "t2-ticket";
+			ArrayList<Ticket> t2Tickets = tickets.get(2);
+			filename = "t2Ticket-";
+			
+			for(Ticket t : t2Tickets) {
+				int id = t.getTicketID();
+				if(FileHandler.checkFileExistance(filename+id+".pdf")) {
+					FileHandler fh = new FileHandler(filename+id+".pdf", "");
+					fh.deleteFile();
+					new PDFWriter(filename+id+".pdf", type, new FileHandler().getUsername(), null, true).createFile();
+					pos = id;
+					break;
+				}
+			}
 		}
 		else {
-			sizeToCheck = tickets.get(3).size();
-			filename = "t3-ticket";
-		}
-		
-		for(int i = 0; i < sizeToCheck; i++) {
-			if(FileHandler.checkFileExistance(filename+i+".pdf")) {
-				FileHandler fh = new FileHandler(filename+i+".pdf", "");
-				fh.deleteFile();
-				new PDFWriter(filename+i+".pdf", type, new FileHandler().getUsername(), null, true).createFile();
-				pos = i;
-				break;
+			ArrayList<Ticket> t3Tickets = tickets.get(3);
+			filename = "t3Ticket-";
+			
+			for(Ticket t : t3Tickets) {
+				int id = t.getTicketID();
+				if(FileHandler.checkFileExistance(filename+id+".pdf")) {
+					FileHandler fh = new FileHandler(filename+id+".pdf", "");
+					fh.deleteFile();
+					new PDFWriter(filename+id+".pdf", type, new FileHandler().getUsername(), null, true).createFile();
+					pos = id;
+					break;
+				}
 			}
 		}
 		
 		final String finalTicketFile = filename+pos+".pdf";
 		
-		new CountDownTimer(timeInMinutes, 1000*60) {
+		CountDownTimer cTimer = new CountDownTimer(timeInMinutes, 1000*60) {
 			
 			public void onTick(long millisUntilFinished) {
 				text.setText("" + millisUntilFinished/(1000*60) + " minutes left");
@@ -102,8 +125,22 @@ public class ValidationListener implements OnClickListener {
 				FileHandler fh = new FileHandler(finalTicketFile, "");
 				fh.deleteFile();
 			}
-		}.start();
+		};
 		
-		((BusTicketer) context.getApplicationContext()).setTimerOn(true);
+		if(pos != -1) {
+			btn.setEnabled(false);
+			for (int i = 0; i < radio.getChildCount(); i++)
+				radio.getChildAt(i).setEnabled(false);
+			
+			cTimer.start();
+			((BusTicketer) context.getApplicationContext()).setTimerOn(true);
+			Intent intent = new Intent(context, BeamActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			intent.putExtra("ID", pos);
+			context.startActivity(intent);
+		}
+		else {
+			Toast.makeText(context, "You have no tickets, please buy some!", Toast.LENGTH_SHORT);
+		}
 	}
 }

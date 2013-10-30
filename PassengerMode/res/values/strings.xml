@@ -21,6 +21,7 @@
     <string name="plus_sign">+</string>
     <string name="minus_sign">-</string>
     <string name="zero_tickets">0</string>
+
     <string-array name="cc_type_spinner_vals">
         <item>Visa</item>
         <item>Visa Electron</item>
@@ -29,6 +30,8 @@
         <item>American Express</item>
         <item>Multibanco</item>
     </string-array>
+
     <string name="slash_string">/</string>
+    <string name="title_activity_beam">BeamActivity</string>
 
 </resources>

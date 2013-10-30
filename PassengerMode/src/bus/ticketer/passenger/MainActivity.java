@@ -14,6 +14,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.text.InputFilter;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.View;
@@ -23,12 +24,14 @@ import android.widget.*;
 import bus.ticketer.adapters.DialogAdapter;
 import bus.ticketer.adapters.SpinnerAdapter;
 import bus.ticketer.connection.ConnectionThread;
+import bus.ticketer.filters.MonthInputFilter;
 import bus.ticketer.utils.*;
 
 public class MainActivity extends Activity {
 
 	private String password = "";
 	private String toFile = "";
+	private String IPAddress = "";
 	private FileHandler fHandler;
 	private RESTFunction currentFunction;
 	ProgressDialog progDialog;
@@ -56,7 +59,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setTheme(android.R.style.Theme_Holo_NoActionBar);
         
-        if(!((BusTicketer) MainActivity.this.getApplication()).isNetworkAvailable())
+        if(!((BusTicketer) MainActivity.this.getApplication()).isNetworkAvailable() && !isRegistered())
         	((BusTicketer) MainActivity.this.getApplication()).networkPrompt();
         else {
         	fHandler = new FileHandler(((BusTicketer) MainActivity.this.getApplication()).getClientFilename(), toFile);
@@ -64,6 +67,8 @@ public class MainActivity extends Activity {
 					MainActivity.this, "",
 					"Loading, please wait!", true);
 	        
+			IPAddress = ((BusTicketer) MainActivity.this.getApplication()).getIPAddress();
+			
 	        handleInitialization();
 	        setContentView(R.layout.activity_main);
 	        
@@ -80,6 +85,9 @@ public class MainActivity extends Activity {
 	        final Spinner spinner = (Spinner) findViewById(R.id.cc_type_spinner);
 	        spinner.setAdapter(new SpinnerAdapter(MainActivity.this, R.layout.spinner_cc_choice_box, cardTypes, images));
 	        
+	        EditText et = (EditText) findViewById(R.id.splash_validity_month);
+	        et.setFilters(new InputFilter[]{ new MonthInputFilter(1, 12)});
+	        
 	        Button registerButton = (Button) findViewById(R.id.splash_register_button);
 	        registerButton.setOnClickListener(new OnClickListener() {
 				
@@ -89,6 +97,10 @@ public class MainActivity extends Activity {
 					}
 			});
         }
+    }
+    
+    private boolean isRegistered() {
+    	return FileHandler.checkFileExistance(((BusTicketer) MainActivity.this.getApplication()).getClientFilename());
     }
     
     private void registerAction(Spinner cardSpinner) {
@@ -113,7 +125,7 @@ public class MainActivity extends Activity {
 		params.add(new BasicNameValuePair("validity", validity));
 
 		currentFunction = RESTFunction.CREATE_CLIENT;
-		ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/create/", Method.POST,params, threadConnectionHandler, progDialog, currentFunction, null, this);
+		ConnectionThread dataThread = new ConnectionThread(IPAddress+"client/create/", Method.POST,params, threadConnectionHandler, progDialog, currentFunction, null, this);
 		dataThread.start();
     }
     
@@ -126,9 +138,15 @@ public class MainActivity extends Activity {
     		params.add(new BasicNameValuePair("name", fileContents.get(0)));
     		params.add(new BasicNameValuePair("pass", fileContents.get(1)));
     		
-    		currentFunction = RESTFunction.LOGIN_CLIENT;
-        	ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/client/login/", Method.POST, params, threadConnectionHandler, progDialog, currentFunction, null, this);
-    		dataThread.start();
+    		if(!((BusTicketer) MainActivity.this.getApplication()).isNetworkAvailable()) {
+    	        Intent intent = new Intent(MainActivity.this, CentralActivity.class);
+    	        startActivity(intent);   			
+    		}
+    		else {
+	    		currentFunction = RESTFunction.LOGIN_CLIENT;
+	        	ConnectionThread dataThread = new ConnectionThread(IPAddress+"client/login/", Method.POST, params, threadConnectionHandler, progDialog, currentFunction, null, this);
+	    		dataThread.start();
+    		}
         }
         else
         	progDialog.dismiss();

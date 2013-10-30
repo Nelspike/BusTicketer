@@ -9,8 +9,32 @@
     tools:context=".MainActivity" >
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/validation_title"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="40sp"
+        android:textColor="@android:color/white"
         android:text="@string/hello_world" />
-
+    
+	<TextView
+        android:id="@+id/terms_textbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="5"
+        android:padding="15dp"
+        android:scrollbars="vertical"
+        android:text="@string/validation_terms"
+        android:layout_below="@+id/validation_title"
+        android:textSize="16sp" />
+	
+	<ImageView 
+	    android:id="@+id/qr_code_holder"
+	    android:contentDescription="@string/description"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center"
+        android:layout_below="@+id/terms_textbox"
+	    android:paddingTop="40dp"/>
+	
 </RelativeLayout>

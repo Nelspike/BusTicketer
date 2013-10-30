@@ -3,6 +3,7 @@ package bus.ticketer.connection;
 import java.util.ArrayList;
 
 import org.apache.http.NameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -48,7 +49,10 @@ public class ConnectionThread extends Thread {
 	public void run() {				
 		runConnection.run();
 		threadMsg();
-		fillList();
+		
+		if(!currentFunction.toString().equals(RESTFunction.BUY_CLIENT_TICKETS_CLICK.toString()) && !currentFunction.toString().equals(RESTFunction.BUY_CONFIRMATION_CLIENT.toString()))
+				fillList();
+		
 		handleView();
 
 		if (progDialog != null)
@@ -68,7 +72,7 @@ public class ConnectionThread extends Thread {
 	private void fillList() {
         JSONObject ticketListing = getJSON();
         SparseArray<ArrayList<Ticket>> tickets = ((BusTicketer) context.getApplicationContext()).getTickets();
-        
+     
         try {
         	
         	if(tickets.size() == 0) {
@@ -77,23 +81,55 @@ public class ConnectionThread extends Thread {
         		tickets.put(3, new ArrayList<Ticket>());
         	}
         	
-            int t1TicketsQuantity = ticketListing.getInt("t1");
-            int t2TicketsQuantity = ticketListing.getInt("t2");
-            int t3TicketsQuantity = ticketListing.getInt("t3");
+            ArrayList<Ticket> t1TicketsCurrent = tickets.get(1);
+            ArrayList<Ticket> t2TicketsCurrent = tickets.get(2);
+            ArrayList<Ticket> t3TicketsCurrent = tickets.get(3);
             
-            ArrayList<Ticket> t1Tickets = tickets.get(1);
-            ArrayList<Ticket> t2Tickets = tickets.get(2);
-            ArrayList<Ticket> t3Tickets = tickets.get(3);
-            
-            for(int i = tickets.get(1).size(); i < t1TicketsQuantity; i++)
-            	t1Tickets.add(new Ticket());
-            
-            for(int i = tickets.get(2).size(); i < t2TicketsQuantity; i++)
-            	t2Tickets.add(new Ticket());
-            
-            for(int i = tickets.get(3).size(); i < t3TicketsQuantity; i++)
-            	t3Tickets.add(new Ticket());
-            
+        	JSONArray t1Tickets = ticketListing.getJSONArray("t1");
+        	JSONArray t2Tickets = ticketListing.getJSONArray("t2");
+        	JSONArray t3Tickets = ticketListing.getJSONArray("t3");
+        	
+        	boolean flag = false;
+        	
+        	for(int i = 0; i < t1Tickets.length(); i++) {
+        		for(Ticket t : t1TicketsCurrent) {
+        			if(t.getTicketID() == t1Tickets.getInt(i)) {
+        				flag = true;
+        				break;
+        			}
+        		}
+        		if(!flag) {
+        			t1TicketsCurrent.add(new Ticket(t1Tickets.getInt(i)));
+        			flag = false;
+        		}
+        	}
+        		
+        	for(int i = 0; i < t2Tickets.length(); i++) {
+        		for(Ticket t : t2TicketsCurrent) {
+        			if(t.getTicketID() == t2Tickets.getInt(i)) {
+        				flag = true;
+        				break;
+        			}
+        		}
+        		if(!flag) {
+        			t2TicketsCurrent.add(new Ticket(t2Tickets.getInt(i)));
+        			flag = false;
+        		}
+        	}
+        	
+        	for(int i = 0; i < t3Tickets.length(); i++) {
+        		for(Ticket t : t3TicketsCurrent) {
+        			if(t.getTicketID() == t3Tickets.getInt(i)) {
+        				flag = true;
+        				break;
+        			}
+        		}
+        		if(!flag) {
+        			t3TicketsCurrent.add(new Ticket(t3Tickets.getInt(i)));
+        			flag = false;
+        		}
+        	}
+        	
             ((BusTicketer) context.getApplicationContext()).setTickets(tickets);
         } catch (JSONException e) {
                 e.printStackTrace();
@@ -129,6 +165,23 @@ public class ConnectionThread extends Thread {
 		final TextView timerText = (TextView) view.findViewById(R.id.ticket_timer);
 		final SparseArray<ArrayList<Ticket>> tickets = ((BusTicketer) context.getApplicationContext()).getTickets();
 		final Button validationButton = (Button) view.findViewById(R.id.ticket_validate);
+
+		/*ImageView qr = (ImageView) view.findViewById(R.id.qr_code_holder);
+		
+		Ticket one = ((BusTicketer) context.getApplicationContext()).getTickets().get(1).get(0);
+		
+		QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(one.getTicketID()+"", null, Contents.Type.TEXT, BarcodeFormat.QR_CODE.toString(), 450);
+		Bitmap bitmap = null;
+		try {
+			bitmap = qrCodeEncoder.encodeAsBitmap();
+		} catch (WriterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		one.setQRCode(bitmap);
+		
+		qr.setImageBitmap(bitmap);*/
 		
 		radioGroup.check(R.id.t1_radio);
 		radioGroup.setOnCheckedChangeListener(new RadioGroupListener(context.getApplicationContext(),ticketsText));
