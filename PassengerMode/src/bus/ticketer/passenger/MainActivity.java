@@ -140,7 +140,9 @@ public class MainActivity extends Activity {
     		
     		if(!((BusTicketer) MainActivity.this.getApplication()).isNetworkAvailable()) {
     	        Intent intent = new Intent(MainActivity.this, CentralActivity.class);
-    	        startActivity(intent);   			
+    	        startActivity(intent);
+				intent.putExtra("Waiting", false);
+		        finish(); 		
     		}
     		else {
 	    		currentFunction = RESTFunction.LOGIN_CLIENT;
@@ -172,13 +174,19 @@ public class MainActivity extends Activity {
 	private void handleLogin(Message msg) {
 		JSONObject received = (JSONObject) msg.obj;	
 		
-		try {
-			received.getString("error");
-			DialogAdapter.dialogYesNoShowing("Incorrect Login!", "Your login info does not exist in the server. Register again?", MainActivity.this, fHandler);			
-		}
-		catch(JSONException jsonExp) {
-	        Intent intent = new Intent(MainActivity.this, CentralActivity.class);
-	        startActivity(intent);
+		if(received == null) 
+			DialogAdapter.connectionIssues(MainActivity.this);
+		else {	
+			try {
+				received.getString("error");
+				DialogAdapter.dialogYesNoShowing("Incorrect Login!", "Your login info does not exist in the server. Register again?", MainActivity.this, fHandler);			
+			}
+			catch(JSONException jsonExp) {
+		        Intent intent = new Intent(MainActivity.this, CentralActivity.class);
+		        startActivity(intent);
+				intent.putExtra("Waiting", false);
+		        finish();
+			}
 		}
 	}
 

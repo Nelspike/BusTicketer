@@ -27,8 +27,10 @@ public class CentralPagerAdapter extends FragmentStatePagerAdapter {
 	public Fragment getItem(int i) {
 		Fragment fragment;
 		
-		if(i == 0) fragment = new ShowTicketsFragment();
-		else fragment = new BuyTicketsFragment();
+		fragment = i == 0 ? new ShowTicketsFragment() : new BuyTicketsFragment();
+		
+		/*if(i == 0) fragment = new ShowTicketsFragment();
+		else fragment = new BuyTicketsFragment();*/
 		
 		fragments.add(fragment);
 		return fragment;
@@ -41,20 +43,19 @@ public class CentralPagerAdapter extends FragmentStatePagerAdapter {
 	
 	 @Override
 	 public Object instantiateItem(View collection, int position) {
-		 System.out.println("I'm in " + position);
          LayoutInflater inflater = (LayoutInflater) collection.getContext()
                  .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
          int resId = 0;
          switch (position) {
-         case 0:
-             resId = R.layout.fragment_show_tickets;
-             break;
-         case 1:
-             resId = R.layout.fragment_buy_tickets;
-             break;
-         case 2:
-             resId = R.layout.fragment_history_tickets;
-             break;
+	         case 0:
+	             resId = R.layout.fragment_show_tickets;
+	             break;
+	         case 1:
+	             resId = R.layout.fragment_buy_tickets;
+	             break;
+	         case 2:
+	             resId = R.layout.fragment_history_tickets;
+	             break;
          }
          
          View view = inflater.inflate(resId, null);

@@ -10,12 +10,14 @@ import org.json.JSONObject;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import bus.ticketer.adapters.DialogAdapter;
 import bus.ticketer.listeners.RadioGroupListener;
 import bus.ticketer.listeners.ValidationListener;
 import bus.ticketer.objects.Ticket;
@@ -46,17 +48,21 @@ public class ConnectionThread extends Thread {
 	}
 
 	@Override
-	public void run() {				
+	public void run() {
+		Looper.prepare();
 		runConnection.run();
 		threadMsg();
 		
-		if(!currentFunction.toString().equals(RESTFunction.BUY_CLIENT_TICKETS_CLICK.toString()) && !currentFunction.toString().equals(RESTFunction.BUY_CONFIRMATION_CLIENT.toString()))
-				fillList();
+		if(!currentFunction.toString().equals(RESTFunction.BUY_CLIENT_TICKETS_CLICK.toString()) 
+				&& !currentFunction.toString().equals(RESTFunction.BUY_CONFIRMATION_CLIENT.toString()))
+			fillList();
 		
 		handleView();
 
 		if (progDialog != null)
 			progDialog.dismiss();
+		
+		Looper.loop();
 	}
 
 	public JSONObject getJSON() {
@@ -71,68 +77,72 @@ public class ConnectionThread extends Thread {
 	
 	private void fillList() {
         JSONObject ticketListing = getJSON();
-        SparseArray<ArrayList<Ticket>> tickets = ((BusTicketer) context.getApplicationContext()).getTickets();
-     
-        try {
-        	
-        	if(tickets.size() == 0) {
-        		tickets.put(1, new ArrayList<Ticket>());
-        		tickets.put(2, new ArrayList<Ticket>());
-        		tickets.put(3, new ArrayList<Ticket>());
-        	}
-        	
-            ArrayList<Ticket> t1TicketsCurrent = tickets.get(1);
-            ArrayList<Ticket> t2TicketsCurrent = tickets.get(2);
-            ArrayList<Ticket> t3TicketsCurrent = tickets.get(3);
-            
-        	JSONArray t1Tickets = ticketListing.getJSONArray("t1");
-        	JSONArray t2Tickets = ticketListing.getJSONArray("t2");
-        	JSONArray t3Tickets = ticketListing.getJSONArray("t3");
-        	
-        	boolean flag = false;
-        	
-        	for(int i = 0; i < t1Tickets.length(); i++) {
-        		for(Ticket t : t1TicketsCurrent) {
-        			if(t.getTicketID() == t1Tickets.getInt(i)) {
-        				flag = true;
-        				break;
-        			}
-        		}
-        		if(!flag) {
-        			t1TicketsCurrent.add(new Ticket(t1Tickets.getInt(i)));
-        			flag = false;
-        		}
-        	}
-        		
-        	for(int i = 0; i < t2Tickets.length(); i++) {
-        		for(Ticket t : t2TicketsCurrent) {
-        			if(t.getTicketID() == t2Tickets.getInt(i)) {
-        				flag = true;
-        				break;
-        			}
-        		}
-        		if(!flag) {
-        			t2TicketsCurrent.add(new Ticket(t2Tickets.getInt(i)));
-        			flag = false;
-        		}
-        	}
-        	
-        	for(int i = 0; i < t3Tickets.length(); i++) {
-        		for(Ticket t : t3TicketsCurrent) {
-        			if(t.getTicketID() == t3Tickets.getInt(i)) {
-        				flag = true;
-        				break;
-        			}
-        		}
-        		if(!flag) {
-        			t3TicketsCurrent.add(new Ticket(t3Tickets.getInt(i)));
-        			flag = false;
-        		}
-        	}
-        	
-            ((BusTicketer) context.getApplicationContext()).setTickets(tickets);
-        } catch (JSONException e) {
-                e.printStackTrace();
+        
+        if(ticketListing == null) 
+        	DialogAdapter.connectionIssues(context);
+        else {
+	        SparseArray<ArrayList<Ticket>> tickets = ((BusTicketer) context.getApplicationContext()).getTickets();
+	     
+	        try {
+	        	if(tickets.size() == 0) {
+	        		tickets.put(1, new ArrayList<Ticket>());
+	        		tickets.put(2, new ArrayList<Ticket>());
+	        		tickets.put(3, new ArrayList<Ticket>());
+	        	}
+	        	
+	            ArrayList<Ticket> t1TicketsCurrent = tickets.get(1);
+	            ArrayList<Ticket> t2TicketsCurrent = tickets.get(2);
+	            ArrayList<Ticket> t3TicketsCurrent = tickets.get(3);
+	            
+	        	JSONArray t1Tickets = ticketListing.getJSONArray("t1");
+	        	JSONArray t2Tickets = ticketListing.getJSONArray("t2");
+	        	JSONArray t3Tickets = ticketListing.getJSONArray("t3");
+	        	
+	        	boolean flag = false;
+	        	
+	        	for(int i = 0; i < t1Tickets.length(); i++) {
+	        		for(Ticket t : t1TicketsCurrent) {
+	        			if(t.getTicketID() == t1Tickets.getInt(i)) {
+	        				flag = true;
+	        				break;
+	        			}
+	        		}
+	        		if(!flag) {
+	        			t1TicketsCurrent.add(new Ticket(t1Tickets.getInt(i)));
+	        			flag = false;
+	        		}
+	        	}
+	        		
+	        	for(int i = 0; i < t2Tickets.length(); i++) {
+	        		for(Ticket t : t2TicketsCurrent) {
+	        			if(t.getTicketID() == t2Tickets.getInt(i)) {
+	        				flag = true;
+	        				break;
+	        			}
+	        		}
+	        		if(!flag) {
+	        			t2TicketsCurrent.add(new Ticket(t2Tickets.getInt(i)));
+	        			flag = false;
+	        		}
+	        	}
+	        	
+	        	for(int i = 0; i < t3Tickets.length(); i++) {
+	        		for(Ticket t : t3TicketsCurrent) {
+	        			if(t.getTicketID() == t3Tickets.getInt(i)) {
+	        				flag = true;
+	        				break;
+	        			}
+	        		}
+	        		if(!flag) {
+	        			t3TicketsCurrent.add(new Ticket(t3Tickets.getInt(i)));
+	        			flag = false;
+	        		}
+	        	}
+	        	
+	            ((BusTicketer) context.getApplicationContext()).setTickets(tickets);
+	        } catch (JSONException e) {
+	                e.printStackTrace();
+	        }
         }
 	}
 	
@@ -187,7 +197,7 @@ public class ConnectionThread extends Thread {
 		radioGroup.setOnCheckedChangeListener(new RadioGroupListener(context.getApplicationContext(),ticketsText));
 		timerText.setText("No ticket Validated");	
 		ticketsText.setText(tickets.get(1).size() + " tickets");
-		validationButton.setOnClickListener(new ValidationListener(radioGroup, context.getApplicationContext(), timerText));
+		validationButton.setOnClickListener(new ValidationListener(radioGroup, context, timerText));
 	}
 	
 	private void buyTicketsHandler() {

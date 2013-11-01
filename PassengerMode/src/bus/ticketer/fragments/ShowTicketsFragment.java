@@ -82,6 +82,6 @@ public class ShowTicketsFragment extends Fragment {
 		radioGroup.setOnCheckedChangeListener(new RadioGroupListener(getActivity().getApplicationContext(),ticketsText));
 		timerText.setText("No ticket Validated");	
 		ticketsText.setText(tickets.get(1).size() + " tickets");
-		validationButton.setOnClickListener(new ValidationListener(radioGroup, getActivity().getApplicationContext(), timerText));
+		validationButton.setOnClickListener(new ValidationListener(radioGroup, this.getActivity(), timerText));
 	}
 }

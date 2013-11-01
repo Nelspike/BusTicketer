@@ -13,7 +13,6 @@ import android.os.Parcelable;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.view.Menu;
 import android.widget.Toast;
 
 @SuppressLint("ShowToast")
@@ -29,7 +28,10 @@ public class BeamActivity extends Activity implements CreateNdefMessageCallback,
 		public void handleMessage(Message msg) {
 			switch(msg.what) {
 				case MESSAGE_SENT:
-					System.out.println("LAWL");
+					Intent intent = new Intent(BeamActivity.this, CentralActivity.class);
+					intent.putExtra("Waiting", true);
+					startActivity(intent);
+					finish();
 					break;
 			}
 		}
@@ -70,12 +72,6 @@ public class BeamActivity extends Activity implements CreateNdefMessageCallback,
 		myNFC.setOnNdefPushCompleteCallback(this, this);
 		
 		ticketID = getIntent().getIntExtra("ID", -1);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.beam, menu);
-		return true;
 	}
 
 	@Override

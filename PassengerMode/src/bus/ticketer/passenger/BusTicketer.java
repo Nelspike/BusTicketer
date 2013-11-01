@@ -14,10 +14,11 @@ import android.util.SparseArray;
 
 public class BusTicketer extends Application {
 
-    private boolean timerOn = false;
+    private boolean timerOn = false, waitingValidation = false;
     private SparseArray<ArrayList<Ticket>> tickets = new SparseArray<ArrayList<Ticket>>();
     private String clientFilename = "client";
-    private String IPAddress = "http://10.13.37.61:81/";
+    private String IPAddress = "http://172.30.78.107:81/";
+    
     public boolean isTimerOn() {
         return timerOn;
     }
@@ -26,6 +27,14 @@ public class BusTicketer extends Application {
         this.timerOn = timerOn;
     }
 
+    public boolean isWaitingValdiation() {
+        return waitingValidation;
+    }
+
+    public void setWaitingValidation(boolean waitingValidation) {
+        this.waitingValidation = waitingValidation;
+    }
+    
 	public SparseArray<ArrayList<Ticket>> getTickets() {
 		return tickets;
 	}
@@ -74,4 +83,8 @@ public class BusTicketer extends Application {
 	public void setIPAddress(String iPAddress) {
 		IPAddress = iPAddress;
 	}
+	
+	/*public Context getBusContext() {
+		return getApplicationContext();
+	}*/
 }

@@ -9,6 +9,7 @@ import bus.ticketer.passenger.R;
 import bus.ticketer.utils.FileHandler;
 import bus.ticketer.utils.PDFWriter;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.CountDownTimer;
@@ -138,6 +139,7 @@ public class ValidationListener implements OnClickListener {
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			intent.putExtra("ID", pos);
 			context.startActivity(intent);
+			((Activity) context).finish();
 		}
 		else {
 			Toast.makeText(context, "You have no tickets, please buy some!", Toast.LENGTH_SHORT);

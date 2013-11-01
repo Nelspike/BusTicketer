@@ -20,6 +20,10 @@ public class CentralActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_central);
+		
+		boolean waiting = getIntent().getBooleanExtra("Waiting", false);
+		((BusTicketer) getApplicationContext()).setWaitingValidation(waiting);
+		
 		tabHandler();
 	}
 

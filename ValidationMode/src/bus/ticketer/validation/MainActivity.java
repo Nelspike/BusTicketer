@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnDismissListener;
-import android.view.Menu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +34,7 @@ public class MainActivity extends Activity implements CreateNdefMessageCallback,
 	private NfcAdapter myNFC;
 	private RESTFunction currentFunction;
 	private int busID = 1;
-	private String IPAddress = "http://10.13.37.61:81/";
+    private String IPAddress = "http://172.30.78.107:81/";
 	private boolean status = false;
 	private Context context;
 	
