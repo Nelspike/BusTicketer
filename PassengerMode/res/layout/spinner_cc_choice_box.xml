@@ -20,7 +20,6 @@
         android:layout_marginTop="2dip"
         android:layout_toRightOf="@+id/spinner_image"
         android:padding="3dip"
-        android:text="Derpus"
         android:textColor="@color/White"
         android:textSize="14sp"
         android:textStyle="bold" />

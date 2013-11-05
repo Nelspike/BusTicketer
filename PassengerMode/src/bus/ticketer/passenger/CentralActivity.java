@@ -4,6 +4,7 @@ import bus.ticketer.adapters.CentralPagerAdapter;
 import bus.ticketer.listeners.BusTabListener;
 import bus.ticketer.listeners.SwipeListener;
 import android.app.ActionBar;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.*;
 import android.support.v4.view.ViewPager;
@@ -32,10 +33,20 @@ public class CentralActivity extends FragmentActivity {
 		tabHandler();
 	}
 
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+        if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+            setContentView(R.layout.activity_central);
+        }
+        else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setContentView(R.layout.activity_central);         
+        }
+	}
+	
 	public void tabHandler() {
 		mCentralActivity = new CentralPagerAdapter(getSupportFragmentManager());
 		mViewPager = (ViewPager) findViewById(R.id.CentralPager);
-		mViewPager.setOffscreenPageLimit(0);
 		mViewPager.setAdapter(mCentralActivity);
 		mViewPager.setOnPageChangeListener(new SwipeListener(mViewPager, CentralActivity.this));
 		app.setAppViewPager(mViewPager);

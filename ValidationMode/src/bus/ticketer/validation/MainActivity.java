@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnDismissListener;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity implements CreateNdefMessageCallback, OnNdefPushCompleteCallback {
@@ -34,7 +33,7 @@ public class MainActivity extends Activity implements CreateNdefMessageCallback,
 	private NfcAdapter myNFC;
 	private RESTFunction currentFunction;
 	private int busID = 1;
-    private String IPAddress = "http://192.168.178.24:81/";
+    private String IPAddress = "http://141.28.129.221:81/";
 	private boolean status = false;
 	private Context context;
 	
@@ -61,9 +60,6 @@ public class MainActivity extends Activity implements CreateNdefMessageCallback,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        TextView text = (TextView) findViewById(R.id.validation_title);
-        text.setText("Welcome aboard!");
         
 		myNFC = NfcAdapter.getDefaultAdapter(this);
 		if(myNFC == null) {

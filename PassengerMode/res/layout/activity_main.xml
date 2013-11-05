@@ -1,156 +1,165 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
     <LinearLayout
-        android:layout_width="0px"
-        android:layout_height="0px"
-        android:focusable="true"
-        android:focusableInTouchMode="true" />
-
-    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawablePadding="15dp"
-        android:drawableTop="@drawable/bus"
-        android:gravity="center"
-        android:text="@string/welcome_string"
-        android:textSize="25sp" />
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin" >
 
-    <TextView
-        android:id="@+id/terms_textbox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:maxLines="5"
-        android:padding="15dp"
-        android:scrollbars="vertical"
-        android:text="@string/splash_screen_terms"
-        android:textSize="16sp" />
+        <LinearLayout
+            android:id="@+id/linear_clear_dummy"
+            android:layout_width="0px"
+            android:layout_height="0px"
+            android:focusable="true"
+            android:orientation="horizontal"
+            android:focusableInTouchMode="true" />
 
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:stretchColumns="1,3" >
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/splash_screen_name_label" />
-
-            <EditText
-                android:id="@+id/splash_namebox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:inputType="text" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:text="@string/splash_screen_password_label" />
-
-            <EditText
-                android:id="@+id/splash_passbox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textWebPassword" />
-        </TableRow>
-
-        <TableRow
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp" >
+            android:drawablePadding="15dp"
+            android:drawableTop="@drawable/bus"
+            android:gravity="center"
+            android:text="@string/welcome_string"
+            android:textSize="25sp" />
 
-            <Spinner
-                android:id="@+id/cc_type_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_span="4" />
-        </TableRow>
-
-        <TableRow
+        <TextView
+            android:id="@+id/terms_textbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp" >
+            android:maxLines="5"
+            android:padding="15dp"
+            android:scrollbars="vertical"
+            android:text="@string/splash_screen_terms"
+            android:textSize="16sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/splash_screen_card_label" />
-
-            <EditText
-                android:id="@+id/splash_cardbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_span="3"
-                android:inputType="number"
-                android:maxLength="16" />
-        </TableRow>
-
-        <TableRow
+        <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp" >
+            android:stretchColumns="1,3" >
 
-            <LinearLayout
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/splash_screen_name_label" />
+
+                <EditText
+                    android:id="@+id/splash_namebox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:inputType="text" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:layout_weight="2"
+                    android:text="@string/splash_screen_password_label" />
+
+                <EditText
+                    android:id="@+id/splash_passbox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:inputType="textWebPassword" />
+            </TableRow>
+
+            <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_span="4"
-                android:orientation="horizontal" >
+                android:paddingTop="10dp" >
+
+                <Spinner
+                    android:id="@+id/cc_type_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_span="4" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp" >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/splash_screen_validity_label" />
+                    android:text="@string/splash_screen_card_label" />
 
                 <EditText
-                    android:id="@+id/splash_validity_month"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:maxLength="2" />
-
-                <TextView
+                    android:id="@+id/splash_cardbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/slash_string" />
-
-                <EditText
-                    android:id="@+id/splash_validity_year"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
+                    android:layout_span="3"
                     android:inputType="number"
-                    android:maxLength="2" />
-            </LinearLayout>
-        </TableRow>
+                    android:maxLength="16" />
+            </TableRow>
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp" >
-
-            <Button
-                android:id="@+id/splash_register_button"
-                android:layout_width="wrap_content"
+            <TableRow
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_span="4"
-                android:gravity="center"
-                android:text="@string/splash_screen_register_button" />
-        </TableRow>
-    </TableLayout>
+                android:paddingTop="10dp" >
 
-</LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_span="4"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/splash_screen_validity_label" />
+
+                    <EditText
+                        android:id="@+id/splash_validity_month"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:maxLength="2" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/slash_string" />
+
+                    <EditText
+                        android:id="@+id/splash_validity_year"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:maxLength="2" />
+                </LinearLayout>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp" >
+
+                <Button
+                    android:id="@+id/splash_register_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_span="4"
+                    android:gravity="center"
+                    android:text="@string/splash_screen_register_button" />
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+
+</ScrollView>

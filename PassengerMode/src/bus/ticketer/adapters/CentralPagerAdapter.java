@@ -29,9 +29,6 @@ public class CentralPagerAdapter extends FragmentStatePagerAdapter {
 		
 		fragment = i == 0 ? new ShowTicketsFragment() : new BuyTicketsFragment();
 		
-		/*if(i == 0) fragment = new ShowTicketsFragment();
-		else fragment = new BuyTicketsFragment();*/
-		
 		fragments.add(fragment);
 		return fragment;
 	}

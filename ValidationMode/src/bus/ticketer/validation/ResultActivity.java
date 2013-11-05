@@ -13,6 +13,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.Menu;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,9 +45,21 @@ public class ResultActivity extends Activity implements CreateNdefMessageCallbac
 		
 		status = getIntent().getExtras().getBoolean("status");
 		TextView text = (TextView) findViewById(R.id.result_box);
+		TextView box = (TextView) findViewById(R.id.instructions_box);
+		ImageView mark = (ImageView) findViewById(R.id.check_box_spot);
 		
-		if(status) text.setBackground(getResources().getDrawable(R.drawable.green_shape));
-		else text.setBackground(getResources().getDrawable(R.drawable.red_shape));
+		if(status) {
+			text.setText("Valid Ticket");
+			text.setTextColor(0xff007500);
+			box.setText(getResources().getText(R.string.success_validation));
+			mark.setImageDrawable(getResources().getDrawable(R.drawable.check_button));
+		}
+		else{
+			text.setText("Invalid Ticket");
+			text.setTextColor(0xff750000);
+			box.setText(getResources().getText(R.string.success_validation));
+			mark.setImageDrawable(getResources().getDrawable(R.drawable.cross_button));
+		}
 		
 		myNFC = NfcAdapter.getDefaultAdapter(this);
 		if(myNFC == null) {

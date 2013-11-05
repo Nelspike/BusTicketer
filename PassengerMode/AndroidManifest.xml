@@ -30,7 +30,13 @@
         </activity>
         <activity
             android:name="bus.ticketer.passenger.CentralActivity"
-            android:label="@string/title_activity_central" >
+            android:label="@string/title_activity_central"
+            android:configChanges="orientation" >
+            <intent-filter>
+				<action android:name="android.nfc.action.NDEF_DISCOVERED" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<data android:mimeType="application/bus.ticketer.message" />
+            </intent-filter>
         </activity>
         <activity
             android:name="bus.ticketer.passenger.BeamActivity"

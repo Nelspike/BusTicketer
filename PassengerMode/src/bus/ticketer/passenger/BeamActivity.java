@@ -12,17 +12,14 @@ import android.os.Message;
 import android.os.Parcelable;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.widget.Toast;
 
-@SuppressLint("ShowToast")
-public class BeamActivity extends Activity implements CreateNdefMessageCallback, OnNdefPushCompleteCallback{
+public class BeamActivity extends Activity implements CreateNdefMessageCallback, OnNdefPushCompleteCallback {
 
 	private NfcAdapter myNFC;
 	private int ticketID;
 	private final int MESSAGE_SENT = 1;
-	private PendingIntent pendingIntent;
 	
 	@SuppressLint("HandlerLeak")
 	private Handler mHandler = new Handler() {
@@ -47,9 +44,6 @@ public class BeamActivity extends Activity implements CreateNdefMessageCallback,
 	@Override
 	public void onResume() {
 		super.onResume();
-		
-		myNFC.enableForegroundDispatch(this, pendingIntent, null, null);
-		
 		if(NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction()))
 			processIntent(getIntent());
 	}
@@ -78,12 +72,8 @@ public class BeamActivity extends Activity implements CreateNdefMessageCallback,
 		
 		myNFC = NfcAdapter.getDefaultAdapter(this);
 		if(myNFC == null) {
-			Toast.makeText(this, "You have no NFC, please try with another device that has NFC!", Toast.LENGTH_SHORT);
-		}
-		
-		pendingIntent = PendingIntent.getActivity(
-				  this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-		
+			Toast.makeText(this, "You have no NFC, please try with another device that has NFC!", Toast.LENGTH_SHORT).show();
+		}		
 		
 		myNFC.setNdefPushMessageCallback(this, this);
 		myNFC.setOnNdefPushCompleteCallback(this, this);

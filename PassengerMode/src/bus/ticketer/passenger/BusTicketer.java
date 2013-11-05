@@ -3,6 +3,7 @@ package bus.ticketer.passenger;
 import java.util.ArrayList;
 
 import bus.ticketer.objects.Ticket;
+import bus.ticketer.runnable.TimerThread;
 
 import android.app.AlertDialog;
 import android.app.Application;
@@ -18,8 +19,11 @@ public class BusTicketer extends Application {
     private boolean timerOn = false, waitingValidation = false, successValidity = false;
     private SparseArray<ArrayList<Ticket>> tickets = new SparseArray<ArrayList<Ticket>>();
     private long[] minutes = {15,30,60};
-    private String clientFilename = "client", IPAddress = "http://192.168.178.24:81/", ticketType;
+    private String clientFilename = "client", IPAddress = "http://141.28.129.221:81/", ticketType;
+    private String fileExtension = ".txt";
     private ViewPager appViewPager;
+    private TimerThread timerThread;
+    private int ticketID=-1;
     
     public boolean isTimerOn() {
         return timerOn;
@@ -112,5 +116,29 @@ public class BusTicketer extends Application {
 
 	public void setAppViewPager(ViewPager appViewPager) {
 		this.appViewPager = appViewPager;
+	}
+
+	public TimerThread getTimerThread() {
+		return timerThread;
+	}
+
+	public void setTimerThread(TimerThread timerThread) {
+		this.timerThread = timerThread;
+	}
+
+	public int getTicketID() {
+		return ticketID;
+	}
+
+	public void setTicketID(int ticketID) {
+		this.ticketID = ticketID;
+	}
+
+	public String getFileExtension() {
+		return fileExtension;
+	}
+
+	public void setFileExtension(String fileExtension) {
+		this.fileExtension = fileExtension;
 	}
 }

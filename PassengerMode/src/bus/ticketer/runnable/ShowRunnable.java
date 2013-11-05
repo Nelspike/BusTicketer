@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 import bus.ticketer.listeners.RadioGroupListener;
 import bus.ticketer.listeners.ValidationListener;
 import bus.ticketer.objects.Ticket;
@@ -38,35 +39,25 @@ public class ShowRunnable implements Runnable {
 		final Button validationButton = (Button) view.findViewById(R.id.ticket_validate);
 
 		if(app.isSuccessValidity())
-			cTimer = BusUtils.initializeTimer(context, timerText, validationButton, radioGroup);
+			cTimer = BusUtils.initializeTimer(context, view);
 		
-		/*ImageView qr = (ImageView) view.findViewById(R.id.qr_code_holder);
-		
-		Ticket one = ((BusTicketer) context.getApplicationContext()).getTickets().get(1).get(0);
-		
-		QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(one.getTicketID()+"", null, Contents.Type.TEXT, BarcodeFormat.QR_CODE.toString(), 450);
-		Bitmap bitmap = null;
-		try {
-			bitmap = qrCodeEncoder.encodeAsBitmap();
-		} catch (WriterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		one.setQRCode(bitmap);
-		
-		qr.setImageBitmap(bitmap);*/
-		
-		if(((BusTicketer) context.getApplicationContext()).isWaitingValidation()) {
+		if(app.isWaitingValidation()) {
 			for (int i = 0; i < radioGroup.getChildCount(); i++)
 				radioGroup.getChildAt(i).setEnabled(false);
 			timerText.setText("Waiting validation...");
 			validationButton.setEnabled(false);
 		}
-		else if(((BusTicketer) context.getApplicationContext()).isSuccessValidity()) {
-			cTimer.start();
+		else if(app.isSuccessValidity()) {
+			if(app.getTimerThread() == null) {
+				TimerThread timer = new TimerThread(cTimer);
+				app.setTimerThread(timer);
+				timer.start();
+				Toast.makeText(context, "Your ticket is valid! Enjoy your trip!", Toast.LENGTH_SHORT).show();
+			}
+			else app.getTimerThread().setView(view);
+
 			validationButton.setEnabled(false);
-			((BusTicketer) context.getApplicationContext()).setTimerOn(true);
+			app.setTimerOn(true);
 		}
 		else {
 			radioGroup.check(R.id.t1_radio);

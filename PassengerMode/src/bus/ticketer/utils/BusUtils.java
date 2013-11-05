@@ -4,15 +4,13 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.util.SparseArray;
-import android.widget.Button;
-import android.widget.RadioGroup;
-import android.widget.TextView;
+import android.view.View;
 import bus.ticketer.objects.Ticket;
 import bus.ticketer.passenger.BusTicketer;
 
 public class BusUtils {
 	
-	public static BusTimer initializeTimer(Activity context, final TextView text, final Button btn, final RadioGroup radio) {
+	public static BusTimer initializeTimer(Activity context, final View view) {
 		BusTicketer app = ((BusTicketer) context.getApplicationContext());
 		SparseArray<ArrayList<Ticket>> tickets = app.getTickets();
 		int type = Integer.parseInt(app.getTicketType().charAt(1)+"");
@@ -25,16 +23,14 @@ public class BusUtils {
 		
 		for(Ticket t : tXTickets) {
 			int id = t.getTicketID();
-			if(FileHandler.checkFileExistance(filename+id+".pdf")) {
-				finalTicketFile = filename+id+".pdf";
-				FileHandler fh = new FileHandler(finalTicketFile, "");
-				fh.deleteFile();
-				new PDFWriter(finalTicketFile, "T"+type, new FileHandler().getUsername(), null, true).createFile();
+			if(FileHandler.checkFileExistance(filename+id+".txt")) {
+				finalTicketFile = filename+id+".txt";
+				new FileWriter(finalTicketFile, new FileHandler().getUsername()).writeToFile();
 				break;
 			}
 		}
 		
-		return new BusTimer(timeInMinutes, span, text, btn, radio, context, finalTicketFile);
+		return new BusTimer(timeInMinutes, span, view, context, finalTicketFile);
 	}
 	
 	public static void purchaseProcess(Activity context) {
@@ -46,25 +42,10 @@ public class BusUtils {
 		for(int i = 1; i <= 3; i++) {
 			ArrayList<Ticket> typeTickets = tickets.get(i);
 			for(Ticket t : typeTickets) {
-				if(!FileHandler.checkFileExistance("t"+i+"Ticket-"+t.getTicketID()+".pdf"))
-					new PDFWriter("t"+i+"Ticket-"+t.getTicketID()+".pdf", "T"+i, fileContents.get(0), null, false).createFile();
+				if(!FileHandler.checkFileExistance("t"+i+"Ticket-"+t.getTicketID()+".txt"))
+					new FileWriter("t"+i+"Ticket-"+t.getTicketID()+".txt", fileContents.get(0)).createFile();
 			}
 		}
-		
-		/*for(Ticket t : t1Tickets) {
-			if(!FileHandler.checkFileExistance(t.getTicketID()+".pdf"))
-				new PDFWriter("t1Ticket-"+t.getTicketID()+".pdf", "T1", fileContents.get(0), null, false).createFile();
-		}
-
-		for(Ticket t : t2Tickets) {
-			if(!FileHandler.checkFileExistance(t.getTicketID()+".pdf"))
-				new PDFWriter("t2Ticket-"+t.getTicketID()+".pdf", "T1", fileContents.get(0), null, false).createFile();
-		}
-		
-		for(Ticket t : t3Tickets) {
-			if(!FileHandler.checkFileExistance(t.getTicketID()+".pdf"))
-				new PDFWriter("t3Ticket-"+t.getTicketID()+".pdf", "T1", fileContents.get(0), null, false).createFile();
-		}*/
 	}
 	
 }

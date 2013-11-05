@@ -66,7 +66,8 @@ public class BuyTicketsFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 			ViewGroup container, Bundle savedInstanceState) {
-
+		
+		setRetainInstance(true);
 		rootView = inflater.inflate(R.layout.fragment_buy_tickets,
 					container, false);
 
@@ -79,6 +80,7 @@ public class BuyTicketsFragment extends Fragment {
 	}
 	
 	public void refresh() {
+		app = (BusTicketer) getActivity().getApplication();
 		getTicketInfo();
 		buyTicketsHandler();	
 	}
@@ -143,8 +145,7 @@ public class BuyTicketsFragment extends Fragment {
 				ArrayList<String> fileContents = fHandler.readFromFile();
 				
 				final ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-				params.add(new BasicNameValuePair("cid",
-						fileContents.get(2)));
+				params.add(new BasicNameValuePair("cid", fileContents.get(2)));
 				params.add(new BasicNameValuePair("t1", t1Tickets.getText().toString()));
 				params.add(new BasicNameValuePair("t2", t2Tickets.getText().toString()));
 				params.add(new BasicNameValuePair("t3", t3Tickets.getText().toString()));
@@ -188,7 +189,7 @@ public class BuyTicketsFragment extends Fragment {
 
 		});
 		
-		if(app.isTimerOn() || !app.isNetworkAvailable()) {
+		if(app.isTimerOn() || !app.isNetworkAvailable() || app.isWaitingValidation()) {
 			t1Minus.setEnabled(false);
 			t2Minus.setEnabled(false);
 			t3Minus.setEnabled(false);
@@ -229,7 +230,7 @@ public class BuyTicketsFragment extends Fragment {
         JSONObject ticketListing = (JSONObject) msg.obj;
         try {
         	for(int i = 0; i < 3; i++)
-        		boughtTickets[i] = ticketListing.getInt("t"+i+1);
+        		boughtTickets[i] = ticketListing.getInt("t"+(i+1));
         	
             transactionCost = ticketListing.getInt("cost");
             confirmationToken = ticketListing.getString("token");

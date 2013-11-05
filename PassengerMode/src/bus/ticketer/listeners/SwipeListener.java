@@ -12,6 +12,7 @@ public class SwipeListener extends ViewPager.SimpleOnPageChangeListener {
 	
 	private ViewPager mViewPager;
 	private Context context;
+	private BusTicketer app;
 	
 	public SwipeListener(ViewPager mViewPager, Context context) {
 		this.mViewPager = mViewPager;
@@ -20,18 +21,18 @@ public class SwipeListener extends ViewPager.SimpleOnPageChangeListener {
 	
 	@Override
 	public void onPageSelected(int position) {
-		
-		if(((BusTicketer) context.getApplicationContext()).isWaitingValidation())
+		this.app = (BusTicketer) context.getApplicationContext();
+		CentralPagerAdapter adapter = (CentralPagerAdapter) mViewPager.getAdapter();
+		if(app.isWaitingValidation()) {
 			((Activity) context).getActionBar().setSelectedNavigationItem(0);
+			((ShowTicketsFragment) adapter.instantiateItem(mViewPager, 0)).refresh();
+		}
 		else {
 			if(position == 0) {
-				if(!((BusTicketer) context.getApplicationContext()).isSuccessValidity()) {
-					((ShowTicketsFragment)((CentralPagerAdapter) mViewPager.getAdapter()).instantiateItem(mViewPager, position)).refresh();
-				}
+				if(!app.isSuccessValidity())
+					((ShowTicketsFragment) adapter.instantiateItem(mViewPager, position)).refresh();
 			}
-			else {
-				((BuyTicketsFragment)((CentralPagerAdapter) mViewPager.getAdapter()).instantiateItem(mViewPager, position)).refresh();
-			}
+			else ((BuyTicketsFragment) adapter.instantiateItem(mViewPager, position)).refresh();
 		
 			((Activity) context).getActionBar().setSelectedNavigationItem(position);
 		}

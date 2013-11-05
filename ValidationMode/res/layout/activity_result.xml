@@ -10,7 +10,29 @@
 
     <TextView
         android:id="@+id/result_box"
+        android:gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:textSize="40sp" />
+    
+    <TextView
+        android:id="@+id/instructions_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:maxLines="10"
+        android:padding="15dp"
+        android:scrollbars="vertical"
+        android:layout_below="@+id/result_box"
+        android:textSize="16sp" />
+    
+	<ImageView
+	    android:id="@+id/check_box_spot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="10dp"
+        android:layout_below="@+id/instructions_box"
+        android:contentDescription="@string/description" />
 
 </RelativeLayout>
