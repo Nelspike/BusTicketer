@@ -38,6 +38,6 @@ public class BusTimer extends CountDownTimer {
 
 	@Override
 	public void onTick(long millisUntilFinished) {
-		timerText.setText("" + millisUntilFinished/(1000*60) + " minutes left");
+		timerText.setText("" + millisUntilFinished/(1000*60) + ":" + (millisUntilFinished/1000)%60 + " minutes left");
 	}
 }

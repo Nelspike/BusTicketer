@@ -16,7 +16,7 @@ public class BusUtils {
 		BusTicketer app = ((BusTicketer) context.getApplicationContext());
 		SparseArray<ArrayList<Ticket>> tickets = app.getTickets();
 		int type = Integer.parseInt(app.getTicketType().charAt(1)+"");
-		long span = 1000*60;
+		long span = 1000;
 		String finalTicketFile = "";
 		
 		long timeInMinutes = app.getMinutes(type-1) * 1000 * 60;

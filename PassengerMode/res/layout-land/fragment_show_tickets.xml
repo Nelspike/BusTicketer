@@ -58,7 +58,6 @@
                 android:layout_weight="0.75"
                 android:gravity="center"
                 android:paddingBottom="20dp"
-                android:text="X tickets left"
                 android:textSize="20sp" />
 
             <Button
