@@ -15,14 +15,19 @@ import android.support.v4.view.ViewPager;
 public class CentralActivity extends FragmentActivity {
 	CentralPagerAdapter mCentralActivity;
 	ViewPager mViewPager;
+	BusTicketer app;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_central);
 		
+		app = (BusTicketer) getApplicationContext();
+		
 		boolean waiting = getIntent().getBooleanExtra("Waiting", false);
-		((BusTicketer) getApplicationContext()).setWaitingValidation(waiting);
+		boolean successVal = getIntent().getBooleanExtra("Success", false);
+		app.setWaitingValidation(waiting);
+		app.setSuccessValidity(successVal);
 		
 		tabHandler();
 	}
@@ -33,7 +38,8 @@ public class CentralActivity extends FragmentActivity {
 		mViewPager.setOffscreenPageLimit(0);
 		mViewPager.setAdapter(mCentralActivity);
 		mViewPager.setOnPageChangeListener(new SwipeListener(mViewPager, CentralActivity.this));
-
+		app.setAppViewPager(mViewPager);
+		
 		final ActionBar actionBar = getActionBar();
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setDisplayShowHomeEnabled(false);

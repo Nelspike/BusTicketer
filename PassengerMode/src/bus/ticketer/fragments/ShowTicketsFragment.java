@@ -11,15 +11,11 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.RadioGroup;
-import android.widget.TextView;
 import bus.ticketer.connection.ConnectionThread;
-import bus.ticketer.listeners.RadioGroupListener;
-import bus.ticketer.listeners.ValidationListener;
 import bus.ticketer.objects.Ticket;
 import bus.ticketer.passenger.BusTicketer;
 import bus.ticketer.passenger.R;
+import bus.ticketer.runnable.ShowRunnable;
 import bus.ticketer.utils.FileHandler;
 import bus.ticketer.utils.Method;
 import bus.ticketer.utils.RESTFunction;
@@ -29,19 +25,21 @@ public class ShowTicketsFragment extends Fragment {
 	private View rootView;
 	private RESTFunction currentFunction;
 	private String IPAddress = "";
+	private BusTicketer app;
 
 	@SuppressLint("HandlerLeak")
 	private Handler threadConnectionHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-
+			
 		}
 	};
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		rootView = inflater.inflate(R.layout.fragment_show_tickets, container, false);
-		IPAddress = ((BusTicketer) getActivity().getApplication()).getIPAddress();
+		app = (BusTicketer) getActivity().getApplication();
+		IPAddress = app.getIPAddress();
 		getTicketInfo();
 		
 		return rootView;
@@ -50,15 +48,16 @@ public class ShowTicketsFragment extends Fragment {
 	public void refresh() {
 		getTicketInfo();
 	}
-	
+		
 	private void getTicketInfo() {
-		FileHandler fHandler = new FileHandler(((BusTicketer) getActivity().getApplication()).getClientFilename(), "");
+		FileHandler fHandler = new FileHandler(app.getClientFilename(), "");
 		ArrayList<String> fileContents = fHandler.readFromFile();
 
-		if(!((BusTicketer) getActivity().getApplication()).isNetworkAvailable()) {
+		if(!app.isNetworkAvailable()) {
 			SparseArray<ArrayList<Ticket>> tickets = FileHandler.getTicketCount();
-			((BusTicketer) getActivity().getApplicationContext()).setTickets(tickets);
-			showTicketsHandler();
+			app.setTickets(tickets);
+			//TODO: Check form files what is validated
+			rootView.post(new ShowRunnable(app, getActivity(), rootView));
 		}
 		else {
 			currentFunction = RESTFunction.GET_CLIENT_TICKETS;
@@ -69,19 +68,5 @@ public class ShowTicketsFragment extends Fragment {
 					currentFunction, rootView, getActivity());
 			dataThread.start();
 		}
-	}
-
-	private void showTicketsHandler() {
-		RadioGroup radioGroup = (RadioGroup) rootView.findViewById(R.id.ticket_radio);
-		TextView ticketsText = (TextView) rootView.findViewById(R.id.show_ticket_amount);
-		TextView timerText = (TextView) rootView.findViewById(R.id.ticket_timer);
-		SparseArray<ArrayList<Ticket>> tickets = ((BusTicketer) getActivity().getApplicationContext()).getTickets();
-		Button validationButton = (Button) rootView.findViewById(R.id.ticket_validate);
-		
-		radioGroup.check(R.id.t1_radio);
-		radioGroup.setOnCheckedChangeListener(new RadioGroupListener(getActivity().getApplicationContext(),ticketsText));
-		timerText.setText("No ticket Validated");	
-		ticketsText.setText(tickets.get(1).size() + " tickets");
-		validationButton.setOnClickListener(new ValidationListener(radioGroup, this.getActivity(), timerText));
 	}
 }

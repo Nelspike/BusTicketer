@@ -10,14 +10,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 
 public class BusTicketer extends Application {
 
-    private boolean timerOn = false, waitingValidation = false;
+    private boolean timerOn = false, waitingValidation = false, successValidity = false;
     private SparseArray<ArrayList<Ticket>> tickets = new SparseArray<ArrayList<Ticket>>();
-    private String clientFilename = "client";
-    private String IPAddress = "http://172.30.78.107:81/";
+    private long[] minutes = {15,30,60};
+    private String clientFilename = "client", IPAddress = "http://192.168.178.24:81/", ticketType;
+    private ViewPager appViewPager;
     
     public boolean isTimerOn() {
         return timerOn;
@@ -27,7 +29,7 @@ public class BusTicketer extends Application {
         this.timerOn = timerOn;
     }
 
-    public boolean isWaitingValdiation() {
+    public boolean isWaitingValidation() {
         return waitingValidation;
     }
 
@@ -83,8 +85,32 @@ public class BusTicketer extends Application {
 	public void setIPAddress(String iPAddress) {
 		IPAddress = iPAddress;
 	}
-	
-	/*public Context getBusContext() {
-		return getApplicationContext();
-	}*/
+
+	public boolean isSuccessValidity() {
+		return successValidity;
+	}
+
+	public void setSuccessValidity(boolean successValidity) {
+		this.successValidity = successValidity;
+	}
+
+	public String getTicketType() {
+		return ticketType;
+	}
+
+	public void setTicketType(String ticketType) {
+		this.ticketType = ticketType;
+	}
+
+	public long getMinutes(int pos) {
+		return pos >= 0 && pos <= 2 ? minutes[pos] : -1;		
+	}
+
+	public ViewPager getAppViewPager() {
+		return appViewPager;
+	}
+
+	public void setAppViewPager(ViewPager appViewPager) {
+		this.appViewPager = appViewPager;
+	}
 }

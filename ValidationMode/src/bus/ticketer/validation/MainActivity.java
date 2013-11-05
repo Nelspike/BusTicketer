@@ -34,7 +34,7 @@ public class MainActivity extends Activity implements CreateNdefMessageCallback,
 	private NfcAdapter myNFC;
 	private RESTFunction currentFunction;
 	private int busID = 1;
-    private String IPAddress = "http://172.30.78.107:81/";
+    private String IPAddress = "http://192.168.178.24:81/";
 	private boolean status = false;
 	private Context context;
 	

@@ -9,7 +9,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -24,24 +23,25 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import bus.ticketer.adapters.DialogAdapter;
 import bus.ticketer.connection.ConnectionThread;
 import bus.ticketer.listeners.TicketPurchaseListener;
 import bus.ticketer.objects.Ticket;
 import bus.ticketer.passenger.BusTicketer;
 import bus.ticketer.passenger.R;
+import bus.ticketer.utils.BusUtils;
 import bus.ticketer.utils.FileHandler;
 import bus.ticketer.utils.Method;
-import bus.ticketer.utils.PDFWriter;
 import bus.ticketer.utils.RESTFunction;
 
 public class BuyTicketsFragment extends Fragment {
-	public static final String ARG_OBJECT = "object";
 	private View rootView;
 	private RESTFunction currentFunction;
 	private SparseArray<ArrayList<Ticket>> tickets;
-	private int t1Bought, t2Bought, t3Bought, transactionCost;
-	private String confirmationToken = "";
-	private String IPAddress = "";
+	private int transactionCost;
+	private int[] boughtTickets = new int[3];
+	private String confirmationToken = "", IPAddress = "";
+	private BusTicketer app;
 
 	@SuppressLint("HandlerLeak")
 	private Handler threadConnectionHandler = new Handler() {
@@ -49,7 +49,7 @@ public class BuyTicketsFragment extends Fragment {
 		public void handleMessage(Message msg) {
 			switch (currentFunction) {
 				case BUY_CLIENT_TICKETS:
-					tickets = ((BusTicketer) getActivity().getApplicationContext()).getTickets();
+					tickets = app.getTickets();
 					break;			
 				case BUY_CLIENT_TICKETS_CLICK:
 					handlePurchase(msg);
@@ -70,7 +70,8 @@ public class BuyTicketsFragment extends Fragment {
 		rootView = inflater.inflate(R.layout.fragment_buy_tickets,
 					container, false);
 
-		IPAddress = ((BusTicketer) getActivity().getApplication()).getIPAddress();
+		app = (BusTicketer) getActivity().getApplication();
+		IPAddress = app.getIPAddress();
 		getTicketInfo();
 		buyTicketsHandler();
 
@@ -83,13 +84,13 @@ public class BuyTicketsFragment extends Fragment {
 	}
 	
 	public void getTicketInfo() {
-		FileHandler fHandler = new FileHandler(((BusTicketer) getActivity().getApplication()).getClientFilename(), "");
+		FileHandler fHandler = new FileHandler(app.getClientFilename(), "");
 		ArrayList<String> fileContents = fHandler.readFromFile();
 
 		
-		if(!((BusTicketer) getActivity().getApplication()).isNetworkAvailable()) {
+		if(!app.isNetworkAvailable()) {
 			SparseArray<ArrayList<Ticket>> tickets = FileHandler.getTicketCount();
-			((BusTicketer) getActivity().getApplicationContext()).setTickets(tickets);
+			app.setTickets(tickets);
 			quantityHandler();			
 		}
 		else {
@@ -138,7 +139,7 @@ public class BuyTicketsFragment extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 
-				FileHandler fHandler = new FileHandler(((BusTicketer) getActivity().getApplication()).getClientFilename(), "");
+				FileHandler fHandler = new FileHandler(app.getClientFilename(), "");
 				ArrayList<String> fileContents = fHandler.readFromFile();
 				
 				final ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -165,12 +166,14 @@ public class BuyTicketsFragment extends Fragment {
 
 							@Override
 							public void onDismiss(DialogInterface dialog) {
-								purchaseProcess();
-								purchaseSuccess();
+								BusUtils.purchaseProcess(getActivity());
+								DialogAdapter.purchaseSuccess(boughtTickets[0], boughtTickets[1], boughtTickets[2], transactionCost, getActivity());
 							}
 						});
 						
-						confirmPurchase(params, pDiag);
+						int[] data = {boughtTickets[0], boughtTickets[1], boughtTickets[2], transactionCost};
+						currentFunction = RESTFunction.BUY_CONFIRMATION_CLIENT;
+						DialogAdapter.confirmPurchase(params, pDiag, data, getActivity(), confirmationToken, threadConnectionHandler, rootView);
 					}
 				});
 				
@@ -185,7 +188,7 @@ public class BuyTicketsFragment extends Fragment {
 
 		});
 		
-		if(((BusTicketer) getActivity().getApplication()).isTimerOn()) {
+		if(app.isTimerOn() || !app.isNetworkAvailable()) {
 			t1Minus.setEnabled(false);
 			t2Minus.setEnabled(false);
 			t3Minus.setEnabled(false);
@@ -203,154 +206,36 @@ public class BuyTicketsFragment extends Fragment {
 			t3Plus.setEnabled(true);
 			buyTickets.setEnabled(true);			
 		}
-		
-		if(!((BusTicketer) getActivity().getApplication()).isNetworkAvailable()) {
-			t1Minus.setEnabled(false);
-			t2Minus.setEnabled(false);
-			t3Minus.setEnabled(false);
-			t1Plus.setEnabled(false);
-			t2Plus.setEnabled(false);
-			t3Plus.setEnabled(false);
-			buyTickets.setEnabled(false);			
-		}
-	}
-	
-	private void purchaseSuccess() {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-
-		alertDialogBuilder.setTitle("Purchase succeeded!");
-
-		alertDialogBuilder
-		.setMessage("You have bought: " + t1Bought + " T1 Tickets, " + t2Bought + " T2 Tickets and " + t3Bought + " T3 Tickets, for " + transactionCost + "€.")
-		.setCancelable(false)
-		.setPositiveButton("OK",new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog,int id) {
-		        refresh();
-			}
-		});
-
-		AlertDialog alertDialog = alertDialogBuilder.create();
-		alertDialog.show();		
-	}
-	
-	private void confirmPurchase(final ArrayList<NameValuePair> params, final ProgressDialog pDiag) {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-
-		alertDialogBuilder.setTitle("Confirm your purchase");
-
-		alertDialogBuilder
-		.setMessage(buildConfirmationMessage())
-		.setCancelable(false)
-		.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog,int id) {
-				params.add(new BasicNameValuePair("token", confirmationToken));
-				
-				currentFunction = RESTFunction.BUY_CONFIRMATION_CLIENT;
-				ConnectionThread dataThread = new ConnectionThread(
-						IPAddress+"buy/", Method.POST,
-						params, threadConnectionHandler, pDiag,
-						currentFunction, rootView, getActivity());
-				dataThread.start();
-			}
-		})
-		.setNegativeButton("No",new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog,int id) {
-		        refresh();
-			}
-		});
-
-		AlertDialog alertDialog = alertDialogBuilder.create();
-		alertDialog.show();		
-	}
-
-	private String buildConfirmationMessage() {
-		String ret = "";
-		
-		if(t1Bought != 0) {
-			ret += t1Bought + "t1 tickets";
-			if(t2Bought != 0) {
-				ret += ", " + t2Bought + "t2 tickets";
-				if(t3Bought != 0) ret += " and " + t3Bought + "t3 tickets";
-			}
-			else
-				if(t3Bought != 0) ret += " and " + t3Bought + "t3 tickets";
-		}
-		else {
-			if(t2Bought != 0) {
-				ret += t2Bought + "t2 tickets";
-				if(t3Bought != 0) ret += " and " + t3Bought + "t3 tickets";
-			}
-			else {
-				if(t3Bought != 0) ret += t3Bought + "t3 tickets";
-				ret = "(no tickets)";
-			}
-		}
-		
-		return "You will get a bonus of: " + ret + " and it will cost you " + transactionCost + " €.";
 	}
 	
 	private void handleBuyPayload(Message msg) {
         JSONObject ticketListing = (JSONObject) msg.obj;
         try {
-        	JSONArray t1Array = ticketListing.getJSONArray("t1");
-        	
-        	for(int i = 0; i < t1Array.length(); i++)
-        		tickets.get(1).add(new Ticket(t1Array.getInt(i)));
-        	
-        	JSONArray t2Array = ticketListing.getJSONArray("t2");
-        	for(int i = 0; i < t2Array.length(); i++)
-        		tickets.get(2).add(new Ticket(t2Array.getInt(i)));
-        	
-        	JSONArray t3Array = ticketListing.getJSONArray("t3");
-        	for(int i = 0; i < t3Array.length(); i++)
-        		tickets.get(3).add(new Ticket(t3Array.getInt(i)));
-        	        	
-        	t1Bought = t1Array.length();
-        	t2Bought = t2Array.length();
-        	t3Bought = t3Array.length();
-        	
+        	for(int i = 1; i <= 3; i++) {
+        		JSONArray ticketsArray = ticketListing.getJSONArray("t"+i);
+        		for(int t = 0; t < ticketsArray.length(); t++)
+        			tickets.get(i).add(new Ticket(ticketsArray.getInt(t)));
+        		
+        		boughtTickets[i-1] = ticketsArray.length();
+        	}
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        ((BusTicketer) getActivity().getApplicationContext()).setTickets(tickets);
-        
+        app.setTickets(tickets);
 	}
 	
 	private void handlePurchase(Message msg) {
         JSONObject ticketListing = (JSONObject) msg.obj;
         try {
-            t1Bought = ticketListing.getInt("t1");
-            t2Bought = ticketListing.getInt("t2");
-            t3Bought = ticketListing.getInt("t3");
+        	for(int i = 0; i < 3; i++)
+        		boughtTickets[i] = ticketListing.getInt("t"+i+1);
+        	
             transactionCost = ticketListing.getInt("cost");
             confirmationToken = ticketListing.getString("token");
         } catch (JSONException e) {
             e.printStackTrace();
         }
-	}
-	
-	private void purchaseProcess() {
-		FileHandler fHandler = new FileHandler(((BusTicketer) getActivity().getApplication()).getClientFilename(), "");
-		ArrayList<String> fileContents = fHandler.readFromFile();
-		ArrayList<Ticket> t1Tickets = tickets.get(1);
-		ArrayList<Ticket> t2Tickets = tickets.get(2);
-		ArrayList<Ticket> t3Tickets = tickets.get(3);
-		
-		for(Ticket t : t1Tickets) {
-			if(!FileHandler.checkFileExistance(t.getTicketID()+".pdf"))
-				new PDFWriter("t1Ticket-"+t.getTicketID()+".pdf", "T1", fileContents.get(0), null, false).createFile();
-		}
-
-		for(Ticket t : t2Tickets) {
-			if(!FileHandler.checkFileExistance(t.getTicketID()+".pdf"))
-				new PDFWriter("t2Ticket-"+t.getTicketID()+".pdf", "T1", fileContents.get(0), null, false).createFile();
-		}
-		
-		for(Ticket t : t3Tickets) {
-			if(!FileHandler.checkFileExistance(t.getTicketID()+".pdf"))
-				new PDFWriter("t3Ticket-"+t.getTicketID()+".pdf", "T1", fileContents.get(0), null, false).createFile();
-		}
 	}
 	
 	private void quantityHandler() {
@@ -361,7 +246,7 @@ public class BuyTicketsFragment extends Fragment {
 		TextView t3TicketsQuantity = (TextView) rootView
 				.findViewById(R.id.t3_ticket_quantity);
 
-		SparseArray<ArrayList<Ticket>> tickets = ((BusTicketer) getActivity().getApplicationContext()).getTickets();
+		SparseArray<ArrayList<Ticket>> tickets = app.getTickets();
 		
 		t1TicketsQuantity.setText(tickets.get(1).size() + "");
 		t2TicketsQuantity.setText(tickets.get(2).size() + "");
