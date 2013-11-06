@@ -66,7 +66,7 @@ public class ConnectionRunnable implements Runnable {
 				sb.append(line);
             
             resultString = sb.toString();
-            
+            System.out.println(resultString);
             try {
 				setResultObject(new JSONObject(resultString));
 			} catch (JSONException e) {
@@ -74,7 +74,7 @@ public class ConnectionRunnable implements Runnable {
 			}
             
             reader.close();
-            } 
+        }
         catch (IOException e) {
         	e.printStackTrace();
           } 

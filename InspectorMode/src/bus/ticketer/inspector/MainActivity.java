@@ -71,7 +71,7 @@ public class MainActivity extends Activity implements CreateNdefMessageCallback,
 	public void onNdefPushComplete(NfcEvent arg0) {
 		//fazer pedido HTTP ao server 
 		String busId="";
-    	ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/getValidated/"+busId, Method.GET, null, threadConnectionHandler);
+    	ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/getValidated/"+busId, Method.GET, null, threadConnectionHandler, null);
 		dataThread.start();
 	}
 	
