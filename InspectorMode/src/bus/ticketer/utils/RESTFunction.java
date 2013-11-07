@@ -1,5 +1,5 @@
 package bus.ticketer.utils;
 
 public enum RESTFunction {
-	VALIDATE_TICKET;
+	GET_VALIDATED_TICKETS;
 }
