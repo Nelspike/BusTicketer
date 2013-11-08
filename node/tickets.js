@@ -104,7 +104,7 @@ sqliteDB.prototype.validate=function(ticket,bus,callback)
 			var ticket=row.tid;
 			if (type==1)dateV=moment().subtract('minutes',15).format("YYYY-MM-DDTHH:mm:ss");
 			if (type==2)dateV=moment().subtract('minutes',30).format("YYYY-MM-DDTHH:mm:ss");
-			if (type==3)dateV=moment().subtract('minutes',45).format("YYYY-MM-DDTHH:mm:ss");
+			if (type==3)dateV=moment().subtract('minutes',60).format("YYYY-MM-DDTHH:mm:ss");
 			if (!row.dateValidated)
 			{
 				var date=timestamp();
@@ -180,7 +180,7 @@ sqliteDB.prototype.getValidated=function(busId,callback)
 	var out=[];
 	var time1=moment().subtract('minutes',15).format("YYYY-MM-DDTHH:mm:ss");
 	var time2=moment().subtract('minutes',30).format("YYYY-MM-DDTHH:mm:ss");
-	var time3=moment().subtract('minutes',45).format("YYYY-MM-DDTHH:mm:ss");
+	var time3=moment().subtract('minutes',60).format("YYYY-MM-DDTHH:mm:ss");
 	ticketConn.serialize(function(){
 		console.log("x1");
 		ticketConn.all("SELECT tid,dateValidated FROM tickets WHERE type=3 AND busID=? AND dateValidated>?",[busId,time3],
