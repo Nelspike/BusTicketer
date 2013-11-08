@@ -72,13 +72,12 @@ public class ConnectionRunnable implements Runnable {
 			try {
 				setResultObject(new JSONObject(resultString));
 			} catch (JSONException e) {
-				System.out.println("Something here?");
+				//Can't parse to JSONObject
 			}
 
 			reader.close();
 		} catch (IOException e) {
-			System.out.println("Let it run");
-			e.printStackTrace();
+			//Can't connect to the server
 		} finally {
 			if (con != null)
 				con.disconnect();

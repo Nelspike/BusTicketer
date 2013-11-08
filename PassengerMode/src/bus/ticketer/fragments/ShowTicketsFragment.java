@@ -13,7 +13,6 @@ import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -85,10 +84,7 @@ public class ShowTicketsFragment extends Fragment implements CreateNdefMessageCa
 	}
 	
 	private void processIntent(Intent intent) {
-		Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-		
-		NdefMessage msg = (NdefMessage) rawMsgs[0];
-		System.out.println(new String(msg.getRecords()[0].getPayload()));
+
 	}
 	
 	

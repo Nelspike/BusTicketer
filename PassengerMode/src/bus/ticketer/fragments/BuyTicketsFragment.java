@@ -129,12 +129,12 @@ public class BuyTicketsFragment extends Fragment {
 		t2Tickets.setText("0");
 		t3Tickets.setText("0");
 
-		t1Minus.setOnClickListener(new TicketPurchaseListener("Minus", t1Tickets));
-		t2Minus.setOnClickListener(new TicketPurchaseListener("Minus", t2Tickets));
-		t3Minus.setOnClickListener(new TicketPurchaseListener("Minus", t3Tickets));
-		t1Plus.setOnClickListener(new TicketPurchaseListener("Plus", t1Tickets));
-		t2Plus.setOnClickListener(new TicketPurchaseListener("Plus", t2Tickets));
-		t3Plus.setOnClickListener(new TicketPurchaseListener("Plus", t3Tickets));
+		t1Minus.setOnClickListener(new TicketPurchaseListener("Minus", "T1", t1Tickets, app));
+		t2Minus.setOnClickListener(new TicketPurchaseListener("Minus", "T2", t2Tickets, app));
+		t3Minus.setOnClickListener(new TicketPurchaseListener("Minus", "T3", t3Tickets, app));
+		t1Plus.setOnClickListener(new TicketPurchaseListener("Plus", "T1", t1Tickets, app));
+		t2Plus.setOnClickListener(new TicketPurchaseListener("Plus", "T2", t2Tickets, app));
+		t3Plus.setOnClickListener(new TicketPurchaseListener("Plus", "T3", t3Tickets, app));
 
 		buyTickets.setOnClickListener(new OnClickListener() {
 
@@ -189,6 +189,33 @@ public class BuyTicketsFragment extends Fragment {
 
 		});
 		
+		if(app.getTickets().get(1).size() >= 10) {
+			t1Minus.setEnabled(false);
+			t1Plus.setEnabled(false);
+		}
+		else {
+			t1Minus.setEnabled(true);
+			t1Plus.setEnabled(true);			
+		}
+		
+		if(app.getTickets().get(2).size() >= 10) {
+			t2Minus.setEnabled(false);
+			t2Plus.setEnabled(false);
+		}
+		else {
+			t2Minus.setEnabled(true);
+			t2Plus.setEnabled(true);		
+		}
+		
+		if(app.getTickets().get(3).size() >= 10) {
+			t3Minus.setEnabled(false);
+			t3Plus.setEnabled(false);
+		}
+		else {
+			t3Minus.setEnabled(true);
+			t3Plus.setEnabled(true);			
+		}
+		
 		if(app.isTimerOn() || !app.isNetworkAvailable() || app.isWaitingValidation()) {
 			t1Minus.setEnabled(false);
 			t2Minus.setEnabled(false);
@@ -198,15 +225,8 @@ public class BuyTicketsFragment extends Fragment {
 			t3Plus.setEnabled(false);
 			buyTickets.setEnabled(false);
 		}
-		else {
-			t1Minus.setEnabled(true);
-			t2Minus.setEnabled(true);
-			t3Minus.setEnabled(true);
-			t1Plus.setEnabled(true);
-			t2Plus.setEnabled(true);
-			t3Plus.setEnabled(true);
-			buyTickets.setEnabled(true);			
-		}
+		else
+			buyTickets.setEnabled(true);
 	}
 	
 	private void handleBuyPayload(Message msg) {

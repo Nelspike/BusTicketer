@@ -11,6 +11,7 @@ import bus.ticketer.connection.ConnectionThread;
 import bus.ticketer.utils.Method;
 import bus.ticketer.utils.RESTFunction;
 import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcAdapter.CreateNdefMessageCallback;
 import android.nfc.NfcAdapter.OnNdefPushCompleteCallback;
@@ -33,9 +34,22 @@ public class MainActivity extends Activity implements CreateNdefMessageCallback,
 	private NfcAdapter myNFC;
 	private RESTFunction currentFunction;
 	private int busID = 1;
-    private String IPAddress = "http://141.28.129.221:81/";
+    private String IPAddress = "http://192.168.178.24:81/";
 	private boolean status = false;
 	private Context context;
+	private final int MESSAGE_SENT = 1;
+	
+	@SuppressLint("HandlerLeak")
+	private Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			switch(msg.what) {
+				case MESSAGE_SENT:
+					((Activity) context).recreate();
+					break;
+			}
+		}
+	};
 	
 	@SuppressLint("HandlerLeak")
 	private Handler threadConnectionHandler = new Handler() {
@@ -55,7 +69,6 @@ public class MainActivity extends Activity implements CreateNdefMessageCallback,
 		}
 	};
 	
-    @SuppressLint("ShowToast")
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +76,7 @@ public class MainActivity extends Activity implements CreateNdefMessageCallback,
         
 		myNFC = NfcAdapter.getDefaultAdapter(this);
 		if(myNFC == null) {
-			Toast.makeText(this, "You have no NFC, please try with another device that has NFC!", Toast.LENGTH_SHORT);
+			Toast.makeText(this, "You have no NFC, please try with another device that has NFC!", Toast.LENGTH_SHORT).show();
 		}
 		
 		myNFC.setNdefPushMessageCallback(this, this);
@@ -126,12 +139,18 @@ public class MainActivity extends Activity implements CreateNdefMessageCallback,
 
 	@Override
 	public void onNdefPushComplete(NfcEvent event) {
+		mHandler.obtainMessage(MESSAGE_SENT).sendToTarget();
 	}
 
 
 	@Override
 	public NdefMessage createNdefMessage(NfcEvent arg0) {
-		return null;
+		String test = "Bus:"+busID;
+				
+		NdefMessage msg = new NdefMessage(new NdefRecord[] {
+			NdefRecord.createMime("application/bus.ticketer.message", test.getBytes())
+		});
+		return msg;
 	}
     
 }

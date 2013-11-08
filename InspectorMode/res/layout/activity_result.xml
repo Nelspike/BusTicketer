@@ -6,36 +6,33 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity" >
+    tools:context=".ResultActivity" >
 
     <TextView
-        android:id="@+id/scan_title"
+        android:id="@+id/result_box"
+        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="40sp"
-        android:textColor="@android:color/white"
-        android:text="@string/inspection_title" />
+        android:textSize="40sp" />
     
-	<TextView
-        android:id="@+id/inspection_instructions"
+    <TextView
+        android:id="@+id/instructions_box"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:maxLines="5"
+        android:maxLines="10"
         android:padding="15dp"
         android:scrollbars="vertical"
-        android:text="@string/inspection_instructions"
-        android:layout_below="@+id/scan_title"
+        android:layout_below="@+id/result_box"
         android:textSize="16sp" />
-	
-    <ImageView
+    
+	<ImageView
+	    android:id="@+id/check_box_spot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:padding="10dp"
-        android:layout_below="@+id/inspection_instructions"
-        android:contentDescription="@string/description"
-        android:src="@drawable/nfc_example" />
-	
+        android:layout_below="@+id/instructions_box"
+        android:contentDescription="@string/description" />
+
 </RelativeLayout>

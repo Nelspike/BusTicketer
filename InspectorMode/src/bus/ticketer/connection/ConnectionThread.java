@@ -40,6 +40,5 @@ public class ConnectionThread extends Thread {
 		Message msgObj = mHandler.obtainMessage();
 		msgObj.obj = getJSON();
 		mHandler.sendMessage(msgObj);
-		System.out.println("Message has been sent");
 	}
 }

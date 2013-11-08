@@ -19,7 +19,7 @@ public class BusTicketer extends Application {
     private boolean timerOn = false, waitingValidation = false, successValidity = false;
     private SparseArray<ArrayList<Ticket>> tickets = new SparseArray<ArrayList<Ticket>>();
     private long[] minutes = {15,30,60};
-    private String clientFilename = "client", IPAddress = "http://141.28.129.221:81/", ticketType;
+    private String clientFilename = "client", IPAddress = "http://192.168.178.24:81/", ticketType;
     private String fileExtension = ".txt";
     private ViewPager appViewPager;
     private TimerThread timerThread;

@@ -1,4 +1,4 @@
-package bus.ticketer.validation;
+package bus.ticketer.inspector;
 
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -12,7 +12,6 @@ import android.os.Message;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.view.Menu;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,7 +28,7 @@ public class ResultActivity extends Activity implements CreateNdefMessageCallbac
 		public void handleMessage(Message msg) {
 			switch(msg.what) {
 				case MESSAGE_SENT:
-					Intent inte = new Intent(ResultActivity.this, MainActivity.class);
+					Intent inte = new Intent(ResultActivity.this, ScanActivity.class);
 					startActivity(inte);
 					break;
 			}
@@ -67,13 +66,6 @@ public class ResultActivity extends Activity implements CreateNdefMessageCallbac
 		
 		myNFC.setNdefPushMessageCallback(this, this);
 		myNFC.setOnNdefPushCompleteCallback(this, this);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.result, menu);
-		return true;
 	}
 
 	@Override

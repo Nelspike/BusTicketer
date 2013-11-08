@@ -1,5 +1,11 @@
 package bus.ticketer.inspector;
 
+import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import bus.ticketer.connection.ConnectionThread;
 import bus.ticketer.utils.Method;
 import bus.ticketer.utils.RESTFunction;
@@ -9,40 +15,54 @@ import android.os.Message;
 import android.os.Parcelable;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.DialogInterface.OnDismissListener;
-import android.view.Menu;
 import android.nfc.*;
-import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
-	public  NfcAdapter mNfcAdapter;
-	public  String revisorID;
+	public NfcAdapter mNfcAdapter;
+	public String IPAddress;
 	private RESTFunction currentFunction;
+	private BusInspector app;
 	private Context context;
+	
+	@SuppressLint("HandlerLeak")
+	private Handler threadConnectionHandler = new Handler(){
+		@Override
+		public void handleMessage(Message msg) {
+			switch(currentFunction) {
+				case GET_VALIDATED_TICKETS:
+					JSONObject object = (JSONObject) msg.obj;
+					JSONArray list = null;
+					try {
+						list = object.getJSONArray("list");
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					parseArray(list);
+					Intent intent = new Intent(context, ScanActivity.class);
+					context.startActivity(intent);
+					((Activity) context).finish();
+					break;
+				default:
+					break;
+			}
+		}
+	};
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button scanId=(Button) findViewById(R.id.TextView1);
+        app = (BusInspector) getApplicationContext();
+        IPAddress = app.IPAddress;
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (mNfcAdapter == null) {
-        	scanId.setText("NFC não suportado");
-            return;
-        }
-        context=this;
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        
+        if (mNfcAdapter == null)
+        	Toast.makeText(this, "You have no NFC, please try with another device that has NFC!", Toast.LENGTH_SHORT).show();
+        
+        context = this;
     }
 
 	@Override
@@ -57,8 +77,7 @@ public class MainActivity extends Activity {
 	public void onNewIntent(Intent intent) {
 		setIntent(intent);
 	}
-	
-	@SuppressLint("ShowToast")
+
 	private void processIntent(Intent intent) {
 		Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 		
@@ -71,38 +90,21 @@ public class MainActivity extends Activity {
 		if(id.equals("-1"))
 			return;
 		
-		
-		
-		ProgressDialog progDialog = ProgressDialog.show(this,
-				"", "Getting validated tickets..",
-				true);
-		
-		progDialog.setOnDismissListener(new OnDismissListener() {
-
-			@Override
-			public void onDismiss(DialogInterface dialog) {
-				Intent intent = new Intent(context, MainActivity.class);
-				//intent.putExtra("status", status);
-				context.startActivity(intent);
-			}
-		});
-		//fazer pedido HTTP ao server 
-		currentFunction=RESTFunction.GET_VALIDATED_TICKETS;
-		String busId=id;
-    	ConnectionThread dataThread = new ConnectionThread("http://192.168.0.136:81/getValidated/"+busId, Method.GET, null, threadConnectionHandler, null);
+		currentFunction = RESTFunction.GET_VALIDATED_TICKETS;
+		String busId = id;
+    	ConnectionThread dataThread = new ConnectionThread(IPAddress + "/validated/"+busId, Method.GET, null, threadConnectionHandler, null);
 		dataThread.start();
-		
 	}
-
 	
-	@SuppressLint("HandlerLeak")
-	private Handler threadConnectionHandler = new Handler(){
-		@Override
-		public void handleMessage(Message msg)
-		{
-			
-			
+	private void parseArray(JSONArray list) {
+		ArrayList<Integer> tickets = new ArrayList<Integer>();
+		for(int i = 0; i < list.length(); i++) {
+			try {
+				tickets.add((Integer) list.get(i));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		}
-	};
-    
+		app.saveTicketList(tickets);
+	}
 }

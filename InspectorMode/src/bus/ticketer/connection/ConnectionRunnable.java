@@ -66,11 +66,10 @@ public class ConnectionRunnable implements Runnable {
 				sb.append(line);
             
             resultString = sb.toString();
-            System.out.println(resultString);
             try {
 				setResultObject(new JSONObject(resultString));
 			} catch (JSONException e) {
-				System.out.println("Something here?");
+				//Can't parse JSON
 			}
             
             reader.close();
