@@ -243,69 +243,79 @@ app.post('/buy', function (req, res) {
 	var token=req.body.token;
 	// Verifica se todos os valores enviados sÃ£o inteiros e maiores que zero
 	// NÃ£o verifica se os cÃ³digos enviados existem na base de dados
-	if( !cid ||!t1||!t2||!t3)
+	if( !cid ||!req.body.t1||!req.body.t2||!req.body.t3)
 		respondToJSON( req, res, {error: 'Bad request'}, 400 );
 	else if(t1>10||t2>10||t3>10) respondToJSON( req, res, {error: 'Bad request, too many tickets'}, 400 );
-	else if (!token)
+	else 
 	{
-		var code;
-		var out={};
-		code = 200;
-		out.t1=0;out.t2=0;out.t3=0;
-		out.cost=t3*3+t2*2+t1*1;
-		resto=t3%10;
-		count=t3-resto;
-		out.t3+=count/10;
-		count=resto+t2;
-		resto=count%10;
-		count=count-resto;
-		out.t2+=count/10;
-		count=resto+t1;
-		resto=count%10;
-		count=count-resto;
-		out.t1+=count/10;
-		out.token='asdlol'+cid;
-		console.log('client ask for tickets price: ',cid, ' ',JSON.stringify( out ));
+		db.checkLimit(cid,t1,t2,t3,function(err)
+		{
+			if(err) 
+			{
+				respondToJSON( req, res, {error: 'Bad request, too many tickets including owned'}, 400 );
+			}
+			else if (!token)
+			{
+				var code;
+				var out={};
+				code = 200;
+				out.t1=0;out.t2=0;out.t3=0;
+				out.cost=t3*3+t2*2+t1*1;
+				resto=t3%10;
+				count=t3-resto;
+				out.t3+=count/10;
+				count=resto+t2;
+				resto=count%10;
+				count=count-resto;
+				out.t2+=count/10;
+				count=resto+t1;
+				resto=count%10;
+				count=count-resto;
+				out.t1+=count/10;
+				out.token='asdlol'+cid;
+				console.log('client ask for tickets price: ',cid, ' ',JSON.stringify( out ));
 
-		respondToJSON( req, res, out, code );
-	
-	}
-	else if (token!='asdlol'+cid)
-	{
-		var code = 500;
-		var out={};
-		out.error = 'wrong token';
-		console.log('Error buying tickets, wrong token ',token);
-		respondToJSON( req, res, out, code );
-	}
-	else {
-		
-		db.buyTickets(cid,t1,t2,t3, function(err,out) {
-			var code;
-
-			if( err ) {
-				code = 500;
-				out.error = 'Impossible to buys tickets for client';
-				console.log('Error buying tickets: ' + err);
+				respondToJSON( req, res, out, code );
+			
+			}
+			else if (token!='asdlol'+cid)
+			{
+				var code = 500;
+				var out={};
+				out.error = 'wrong token';
+				console.log('Error buying tickets, wrong token ',token);
+				respondToJSON( req, res, out, code );
 			}
 			else {
-				code = 200;
-				if (!out)
-				{
-					out.error = 'Wrong user';
-					console.log('Fail buy tickets: ',cid);
-				}
-				else
-				{
-					console.log('client tickets after buy: ',cid, ' ',JSON.stringify( out ));
-					
-				}
-			}
+				
+				db.buyTickets(cid,t1,t2,t3, function(err,out) {
+					var code;
 
-			respondToJSON( req, res, out, code );
-		
+					if( err ) {
+						code = 500;
+						out.error = 'Impossible to buys tickets for client';
+						console.log('Error buying tickets: ' + err);
+					}
+					else {
+						code = 200;
+						if (!out)
+						{
+							out.error = 'Wrong user';
+							console.log('Fail buy tickets: ',cid);
+						}
+						else
+						{
+							console.log('client tickets after buy: ',cid, ' ',JSON.stringify( out ));
+							
+						}
+					}
+
+					respondToJSON( req, res, out, code );
+				
+				});
+				
+			}
 		});
-		
 	}
 });
 

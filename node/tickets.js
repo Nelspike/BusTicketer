@@ -281,6 +281,38 @@ sqliteDB.prototype.buyTickets=function(clientID,t1,t2,t3,callback)
 			});	
 	});
 }
+
+sqliteDB.prototype.checkLimit=function(clientID,t1,t2,t3,callback)
+{
+	console.log("checking limit for",clientID);
+	if ( typeof callback !== 'function')
+		throw new Error('Callback is not a function');	
+	var out={};out.t1=t1;out.t2=t2;out.t3=t3;
+	ticketConn.each("SELECT type, tid FROM tickets WHERE cid=? AND busID is NULL",[clientID],
+		function (err,row) { //eachfunction
+			if (err)
+			{
+				console.log("each ticket error ",err);
+			}
+			else
+			{
+				if (row.type==1) out.t1++;
+				if (row.type==2) out.t2++;
+				if (row.type==3) out.t3++;
+			}
+		},
+		function(err,nrows)
+		{
+			console.log(JSON.stringify(out));
+			if (err) 
+			{
+				console.log("err in check limit",JSON.stringify(err));
+				callback(err);
+			}
+			else if (out.t1>10||out.t2>10||out.t3>10) callback(out);
+			else callback(null);
+		});	
+}
  
 /*
  *	TICKET CLASS
