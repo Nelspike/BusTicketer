@@ -183,38 +183,38 @@ sqliteDB.prototype.getValidated=function(busId,callback)
 	var time3=moment().subtract('minutes',45).format("YYYY-MM-DDTHH:mm:ss");
 	ticketConn.serialize(function(){
 		console.log("x1");
-		ticketConn.all("SELECT cid,dateValidated FROM tickets WHERE type=3 AND busID=? AND dateValidated>?",[busId,time3],
+		ticketConn.all("SELECT tid,dateValidated FROM tickets WHERE type=3 AND busID=? AND dateValidated>?",[busId,time3],
 		function (err,row) {
 			if (row && !err)
 			{
 				console.log("validated t3 ",JSON.stringify(row));
 				for (var i=0;i<row.length;i++)
 				{
-					out.push(row[i].cid);
+					out.push(row[i].tid);
 				}
 			}
 			else
 				console.log("error get validated t3: ",err);
 		});
-		ticketConn.all("SELECT cid,dateValidated FROM tickets WHERE type=2 AND busID=? AND dateValidated>?",[busId,time2],
+		ticketConn.all("SELECT tid,dateValidated FROM tickets WHERE type=2 AND busID=? AND dateValidated>?",[busId,time2],
 		function (err,row) {
 			if (row && !err)
 			{
 				console.log("validated t2 ",JSON.stringify(row));
 				for (var i=0;i<row.length;i++)
-					out.push(row[i].cid);
+					out.push(row[i].tid);
 			}
 			else
 				console.log("error get validated t2: ",err);
 		});
-		ticketConn.all("SELECT cid,dateValidated FROM tickets WHERE type=1 AND busID=? AND dateValidated>?",[busId,time1],
+		ticketConn.all("SELECT tid,dateValidated FROM tickets WHERE type=1 AND busID=? AND dateValidated>?",[busId,time1],
 		function (err,row) {
 			if (row && !err)
 			{
 			
 				console.log("validated t1",JSON.stringify(row));
 				for (var i=0;i<row.length;i++)
-					out.push(row[i].cid);
+					out.push(row[i].tid);
 			}
 			else
 				console.log("error get validated t1: ",err);

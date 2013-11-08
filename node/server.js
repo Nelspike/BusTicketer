@@ -312,7 +312,7 @@ app.post('/buy', function (req, res) {
 
 //verificar bilhetes validados num terminal
 //GET /validated/:busId PARAMS busId=id do terminal de validacao
-//returns json array client IDs [1,2,4]
+//returns json array ticket IDs [1,2,4]
 app.get("/validated/:busId",function(req,res){
 	var busId=req.params.busId;
 	if (!busId)
@@ -329,7 +329,7 @@ app.get("/validated/:busId",function(req,res){
 			else
 			{
 				out.list=rows;
-				console.log('validated clients: ',busId, ' ',JSON.stringify( out ));
+				console.log('validated tickets: ',busId, ' ',JSON.stringify( out ));
 			}
 			
 
