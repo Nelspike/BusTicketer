@@ -1,5 +1,4 @@
 #BusTicketer
-===========
 
 ###Overview
 
