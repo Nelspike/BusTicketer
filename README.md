@@ -32,3 +32,7 @@ Since each passenger will have tickets stored within the application, each inspe
 ### Validation Mode
 
 Simply, each validation is done via the NFC technology. Each passenger can validate tickets on the terminal, as much as each inspector can check in the vehicle throughout this very same terminal. The application consists of one screen only, which will be static and only used for NFC communications.
+
+### Screenshots
+
+![Starting Activity](/images/Intro.png)

@@ -34,5 +34,6 @@ proguard/
 # nodejs
 *.db
 
-#SWP Files
+#Temp Files
 *.swp
+*.*~
