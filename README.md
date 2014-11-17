@@ -35,4 +35,11 @@ Simply, each validation is done via the NFC technology. Each passenger can valid
 
 ### Screenshots
 
-![Starting Activity](/images/Intro.png =100px)
+<div style="text-align: center">
+  <img src="/images/Intro.png" width="200px" >
+  <img src="/images/ShowFragment.png" width="200px" >
+  <img src="/images/TicketFragment.png" width="200px" >
+  <img src="/images/PurchaseConfirm.png" width="200px" >
+  <img src="/images/PurchaseConcluded.png" width="200px" >
+  <img src="/images/ValidTicket.png" width="200px" >
+</div>
