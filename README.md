@@ -35,4 +35,4 @@ Simply, each validation is done via the NFC technology. Each passenger can valid
 
 ### Screenshots
 
-![Starting Activity](/images/Intro.png)
+![Starting Activity](/images/Intro.png =100px)
